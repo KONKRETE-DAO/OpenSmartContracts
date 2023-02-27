@@ -1,0 +1,5 @@
+{
+  "remappings": [
+    "@openzeppelin/=/Users/nigelbook/Konkrete/SmartContracts/node_modules/@openzeppelin/"
+  ]
+}

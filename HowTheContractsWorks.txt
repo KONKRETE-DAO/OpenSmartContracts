@@ -1,0 +1,30 @@
+In order to lend to the vault, users must be whitelisted. Whitelist access is granted manually by the team in order to limit the number of depositors to the vault and have the hand on who deposits.
+The whitelist selection is done on social media and does not appear on the frontend of the platform.
+This is the first prerequisite to start lending on Konkrete protocol. The second prerequisite is the KYC process, which provides a country code.
+If the country code is 0, it means that the user has not completed KYC, while a country code of BLACKLIST (65535)  indicates that the user has been blacklisted.
+The interest of that is to keep the trace of a user being blacklisted and a simply non-whitelisted user.
+The contract also checks the country code of the token owner to determine if citizens of that country are allowed to invest in Konkrete.
+So... to have the authorisation to buy (function canBuy). A user should have a countrycode , not being blacklisted, and being whitelisted.
+
+
+The vault is an upgradeable contract that uses standardized functions from the ERC-4626 standard.
+It is used by various real-world asset providers such as Circle (USDC), Goldfinch, and apWine.
+This contract provides flexibility to the platform, and its value and internal security are legally backed rather than fully reliant on the blockchain.
+This allows the contract to be upgraded to prevent external security vulnerabilities.
+
+
+When the vault is deployed and initialized, the asset used for purchasing is passed to it.
+The contract checks if the token has a "decimals" function (using the standard) and if the return value is a regular amount with either 6 or 18 decimals (depending on the asset being purchased).
+If the token does not meet these criteria, it is rejected.
+The contract also sets a hard cap, soft cap, deposit start and stop times, and a maximum purchase amount per user.
+During the deposit period, users can use the deposit or mint functions to buy tokens up to their maximum limit.
+If the soft cap is not reached by the end of the deposit period, the sale fails and users can get their money back.
+If the soft cap is reached, the funds are invested off-chain by the treasury.
+
+
+At the end of maturity, the capital and interest are refunded to users.
+The token price is artificially raised every epoch (typically monthly, when comes the data from the investor), and at the end of maturity, users can burn their tokens to receive an amount of stable equivalent to their token price.
+It is important to note that there may be a lack of liquidity since the funds are invested off-chain.
+Users can withdraw their funds at the end of maturity, before investment, or if the auction fails.
+
+You have to keep in mind that L2 like polygons focuses the charges on the call data. So the gas optimisation is not the same than in traditional l1s.
