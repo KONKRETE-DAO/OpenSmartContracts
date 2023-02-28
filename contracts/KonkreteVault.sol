@@ -36,9 +36,9 @@ contract KonkreteVault is
   bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
   bytes32 public constant DEV = keccak256("DEV");
 
-  /**@dev originalPrice will never changes (considered as immutbale), it correspond to 1/1 asset/token 
-  It  can be used as tokenMantissa */
-  uint256 public originalPrice;
+  /**@dev assetMantissa will never changes (considered as immutable), it correspond to 1/1 asset/token 
+  It  can be used as originalPrice */
+  uint256 private assetMantissa;
 
   /**
    *****************************Variables******************************************
@@ -90,10 +90,11 @@ contract KonkreteVault is
     uint256 remainingCapital,
     uint256 loss
   );
-  event InterestRefunded(uint256 expected, uint256 refunded);
+  event InterestRefunded(uint256 refunded);
   event CapitalRefunded(uint256 amount, uint256 collected);
 
   event TimesUpdated(uint256 depositsStart, uint256 depositsStop);
+  event CapsUpdated(uint256 softCap, uint256 hardCap);
   event VaultURIUpdated(string vaultURI_);
   event TreasuryUpdated(address oldTreasury, address newTreasury);
   event PriceUpdated(uint256 oldPrice, uint256 newPrice);
@@ -105,9 +106,10 @@ contract KonkreteVault is
     uint256 expected2,
     uint256 current
   );
-  error BelowMinimumInvest(uint minimum, uint amount);
+  error BelowMinimumInvest(uint256 minimum, uint256 amount);
 
   error WrongSaleTimeStamps();
+  error TryToCollectZeroFund();
   error WrongCaps();
   error WrongDatabase();
   error WrongTreasury(address treasury);
@@ -149,10 +151,10 @@ contract KonkreteVault is
     __ReentrancyGuard_init();
 
     if (!dataBase_.isDatabase()) revert WrongDatabase();
-    uint assetDecimals = IERC20MetadataUpgradeable(asset_).decimals();
+    uint256 assetDecimals = IERC20MetadataUpgradeable(asset_).decimals();
     if (assetDecimals != 18 && assetDecimals != 6)
       revert WrongDecimalNumber(18, 6, assetDecimals);
-    uint assetMantissa = 10 ** assetDecimals;
+    uint256 assetMantissa_ = 10 ** assetDecimals;
 
     _grantRole(KONKRETE, multisig);
     _grantRole(DEV, multisig);
@@ -170,9 +172,9 @@ contract KonkreteVault is
     dataBase = dataBase_;
 
     maxDepositPerUser = softCap / 3;
-    minInvestPerUser = 500 * assetMantissa;
+    minInvestPerUser = 500 * assetMantissa_;
 
-    originalPrice = tokenPrice = assetMantissa;
+    assetMantissa = tokenPrice = assetMantissa_;
   }
 
   /**
@@ -197,18 +199,10 @@ contract KonkreteVault is
   function collectUnclaimedFunds()
     external
     onlyRole(TIMELOCK)
-    returns (uint256)
+    returns (uint256 pendingFunds)
   {
-    SaleStep step = getStep();
-    if (step != SaleStep.CAPITAL_REFUNDED)
-      revert NotExpectedStep(SaleStep.CAPITAL_REFUNDED, step);
-    IERC20 stable = IERC20(asset());
-    uint256 pendingFunds = stable.balanceOf(address(this));
-    stable.safeTransfer(treasury, pendingFunds);
-
+    pendingFunds = _collect(SaleStep.CAPITAL_REFUNDED);
     emit UnclaimedFundsCollected(pendingFunds);
-
-    return pendingFunds;
   }
 
   // DEV functions
@@ -216,21 +210,11 @@ contract KonkreteVault is
 @notice  Collect capital 👍
 @dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
  */
-  function collectCapital() external returns (uint256) {
+  function collectCapital() external returns (uint256 collected) {
     address treasury_ = treasury;
     if (_msgSender() != treasury_) revert WrongTreasury(_msgSender());
-    SaleStep step = getStep();
-
-    if (step != SaleStep.SALE_COMPLETE)
-      revert NotExpectedStep(SaleStep.SALE_COMPLETE, step);
-
-    IERC20 stable = IERC20(asset());
-    uint256 collectedCapital_ = stable.balanceOf(address(this));
-    stable.safeTransfer(treasury_, collectedCapital_);
-
-    emit CapitalCollected(collectedCapital_);
-
-    return collectedCapital_;
+    collected = _collect(SaleStep.SALE_COMPLETE);
+    emit CapitalCollected(collected);
   }
 
   /**
@@ -240,14 +224,16 @@ contract KonkreteVault is
   function refundCapital(uint256 capitalAndInterest) external {
     if (_msgSender() != treasury) revert WrongTreasury(_msgSender());
     SaleStep step = getStep();
-    if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
+    if (step != SaleStep.SALE_COMPLETE && step != SaleStep.CAPITAL_REFUNDED)
+      revert WrongStep(step);
 
     uint256 collectedCapital_ = collectedCapital;
-    IERC20(asset()).safeTransferFrom(
-      _msgSender(),
-      address(this),
-      capitalAndInterest
-    );
+    if (collectedCapital_ > 0)
+      IERC20(asset()).safeTransferFrom(
+        _msgSender(),
+        address(this),
+        capitalAndInterest
+      );
 
     emit CapitalRefunded(capitalAndInterest, collectedCapital_);
 
@@ -261,15 +247,12 @@ contract KonkreteVault is
         uint256(-interest)
       );
     } else if (interest > 0) {
-      emit InterestRefunded(
-        amountImpact(oldPrice - originalPrice),
-        uint256(interest)
-      );
+      emit InterestRefunded(uint256(interest));
     }
     uint256 newPrice = priceImpact(capitalAndInterest);
     tokenPrice = newPrice;
-    emit PriceUpdated(oldPrice, newPrice);
     refunded = true;
+    emit PriceUpdated(oldPrice, newPrice);
   }
 
   /** 
@@ -305,8 +288,9 @@ contract KonkreteVault is
 
   function setTimes(uint256 start, uint256 stop) external onlyRole(DEV) {
     SaleStep step = getStep();
-    if (uint(step) > 2) revert WrongStep(step);
-    if (start == 0 || start > stop) revert WrongSaleTimeStamps();
+    if (uint256(step) > 2) revert WrongStep(step);
+    if (start == 0 || start > stop || start < block.timestamp)
+      revert WrongSaleTimeStamps();
     emit TimesUpdated(start, stop);
     depositsStart = start;
     depositsStop = stop;
@@ -316,6 +300,7 @@ contract KonkreteVault is
     if (soft == 0 || soft > hard) revert WrongCaps();
     softCap = soft;
     hardCap = hard;
+    emit CapsUpdated(soft, hard);
   }
 
   function setDepositLimitsPerUser(
@@ -325,7 +310,7 @@ contract KonkreteVault is
     uint256 softCap_ = softCap;
     if (maxDeposit_ > softCap_)
       revert WrongMaxDepositPerUser(softCap_, maxDeposit_);
-    if (minInvest_ > minInvest_)
+    if (minInvest_ >= maxDeposit_)
       revert WrongMaxDepositPerUser(softCap_, minInvest_);
     maxDepositPerUser = maxDeposit_;
     minInvestPerUser = minInvest_;
@@ -336,8 +321,7 @@ contract KonkreteVault is
 @param vaultURI_ require to not be an empty string
  */
   function setVaultURI(string calldata vaultURI_) external onlyRole(KONKRETE) {
-    if (bytes32(abi.encodePacked(vaultURI_)) == bytes32(0))
-      revert WrongVaultURI(vaultURI_);
+    if (bytes(vaultURI_).length == 0) revert WrongVaultURI(vaultURI_);
 
     emit VaultURIUpdated(vaultURI_);
     vaultURI = vaultURI_;
@@ -349,6 +333,21 @@ contract KonkreteVault is
 
   function unpause() external onlyRole(KONKRETE) {
     _unpause();
+  }
+
+  /**
+  @notice Inverse of priceImpact
+   */
+  function amountImpact(
+    uint256 priceRaiseOrLower
+  ) external view returns (uint256) {
+    return priceRaiseOrLower.mulDiv(totalSupply(), assetMantissa);
+  }
+
+  /**
+    @notice check the originalPrice */
+  function originalPrice() external view returns (uint256) {
+    return assetMantissa;
   }
 
   /**
@@ -369,7 +368,7 @@ contract KonkreteVault is
     uint256 assets,
     address receiver
   ) public override nonReentrant whenNotPaused returns (uint256) {
-    _invest(assets, _msgSender(), receiver, true);
+    _invest(assets, _msgSender(), receiver);
     return assets;
   }
 
@@ -383,7 +382,7 @@ contract KonkreteVault is
     uint256 shares,
     address receiver
   ) public override nonReentrant whenNotPaused returns (uint256) {
-    _invest(shares, _msgSender(), receiver, false);
+    _invest(shares, _msgSender(), receiver);
     return shares;
   }
 
@@ -401,15 +400,14 @@ contract KonkreteVault is
     SaleStep step = getStep();
     if (uint256(step) == uint256(SaleStep.SALE_COMPLETE))
       revert WrongStep(step);
-    require(
-      assets <=
-        _convertToAssets(balanceOf(owner), MathUpgradeable.Rounding.Down),
-      "ERC4626: withdraw more than max"
-    );
-
     shares = previewWithdraw(assets);
+    require(shares <= balanceOf(owner), "ERC4626: withdraw more than max");
+
     _withdraw(_msgSender(), receiver, owner, assets, shares);
-    if (step != SaleStep.CAPITAL_REFUNDED) collectedCapital -= assets;
+    if (step != SaleStep.CAPITAL_REFUNDED) {
+      collectedCapital -= assets;
+      if (owner == receiver) paid[owner] -= assets;
+    }
   }
 
   /** @notice Withdraw asset for a given @param shares (token) amount 
@@ -428,7 +426,10 @@ contract KonkreteVault is
 
     assets = previewRedeem(shares);
     _withdraw(_msgSender(), receiver, owner, assets, shares);
-    if (step != SaleStep.CAPITAL_REFUNDED) collectedCapital -= assets;
+    if (step != SaleStep.CAPITAL_REFUNDED) {
+      collectedCapital -= assets;
+      if (owner == receiver) paid[owner] -= assets;
+    }
   }
 
   //Public View functions
@@ -491,48 +492,43 @@ contract KonkreteVault is
    * (floating point, which is non existant in solidity)
    */
   function priceImpact(uint256 amountOfInterest) public view returns (uint256) {
-    return amountOfInterest.mulDiv(originalPrice, totalSupply());
-  }
-
-  /**
-  @notice Inverse of priceImpact
-   */
-  function amountImpact(
-    uint256 priceRaiseOrLower
-  ) public view returns (uint256) {
-    return priceRaiseOrLower.mulDiv(totalSupply(), originalPrice);
+    return amountOfInterest.mulDiv(assetMantissa, totalSupply());
   }
 
   /**
    *****************************Internal Functions******************************************
    */
   /** @notice Common function of mint & deposit
-    Because tokenPrice will be equal to originalPrice till the sale is not completed, functions are pretty the same.
-    Just keeping it to fit to the standard and using @param isDeposit  to throw adequat errors.
+    Because tokenPrice will be equal to assetMantissa till the sale is not completed, functions are pretty the same.
    */
-  function _invest(
-    uint256 amount,
-    address sender,
-    address receiver,
-    bool isDeposit
-  ) internal {
+  function _invest(uint256 amount, address sender, address receiver) internal {
     if (!dataBase.canBuy(sender)) revert MsgSenderUnauthorized(sender);
 
     SaleStep step = getStep();
     if (step != SaleStep.SALE) revert NotExpectedStep(SaleStep.SALE, step);
 
-    require(
-      amount <= _maxDeposit(sender),
-      isDeposit
-        ? "ERC4626: deposit more than max"
-        : "ERC4626: mint more than max"
-    );
-    uint min = minInvest(sender);
+    require(amount <= _maxDeposit(sender), "ERC4626: deposit more than max");
+    uint256 min = minInvest(sender);
     if (amount < min) revert BelowMinimumInvest(min, amount);
     _deposit(sender, receiver, amount, amount);
     collectedCapital += amount;
 
     paid[sender] += amount;
+  }
+
+  /** @notice Common function of collectCapital and collectUnClaimedCapital
+    Collect and transfer funds to the treasury
+   */
+  function _collect(
+    SaleStep expectedStep
+  ) internal returns (uint256 pendingFunds) {
+    SaleStep step = getStep();
+    if (step != expectedStep)
+      revert NotExpectedStep(SaleStep.CAPITAL_REFUNDED, step);
+    IERC20 stable = IERC20(asset());
+    pendingFunds = stable.balanceOf(address(this));
+    if (pendingFunds == 0) revert TryToCollectZeroFund();
+    stable.safeTransfer(treasury, pendingFunds);
   }
 
   //Internal View functions
@@ -546,7 +542,7 @@ contract KonkreteVault is
     MathUpgradeable.Rounding rounding
   ) internal view override returns (uint256 assets) {
     assets = shares > 0
-      ? shares.mulDiv(tokenPrice, originalPrice, rounding)
+      ? shares.mulDiv(tokenPrice, assetMantissa, rounding)
       : 0;
   }
 
@@ -559,7 +555,7 @@ contract KonkreteVault is
     MathUpgradeable.Rounding rounding
   ) internal view override returns (uint256 shares) {
     shares = assets > 0
-      ? assets.mulDiv(originalPrice, tokenPrice, rounding)
+      ? assets.mulDiv(assetMantissa, tokenPrice, rounding)
       : 0;
   }
 
