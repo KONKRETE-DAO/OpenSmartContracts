@@ -16,7 +16,7 @@ the price raise is check every time we've got the confirmation of the interest f
 After  sale is completed , the funds are locked till refund.
 This version is on l2 so we balanced the readability and  gas optimization
  */
-contract KonkreteVault is
+contract WrongVault is
   ERC4626Upgradeable,
   AccessControlEnumerableUpgradeable,
   ReentrancyGuardUpgradeable,
@@ -76,7 +76,7 @@ contract KonkreteVault is
    *****************************Mappings******************************************
    */
 
-  mapping(address => uint256) public paid;
+  mapping(address => uint256) paid;
 
   /**
    *****************************Events******************************************
@@ -395,8 +395,6 @@ contract KonkreteVault is
    Upgrades : 
    -Checking the sale periode
    -Reduce collected capital if it happens before refund
-   We check if the withdraw occurs in another phase than CAPITAL_REFUNDED
-    to keep a trace of the amount user commited in the vault.
     */
   function withdraw(
     uint256 assets,
@@ -410,11 +408,8 @@ contract KonkreteVault is
     require(shares <= balanceOf(owner), "ERC4626: withdraw more than max");
 
     _withdraw(_msgSender(), receiver, owner, assets, shares);
-    if (step != SaleStep.CAPITAL_REFUNDED) {
-      collectedCapital -= assets;
-      uint256 paid_ = paid[owner];
-      paid[owner] = assets >= paid_ ? 0 : paid_ - assets;
-    }
+
+    paid[owner] -= assets;
   }
 
   /** @notice Withdraw asset for a given @param shares (token) amount 
@@ -434,11 +429,7 @@ contract KonkreteVault is
     assets = previewRedeem(shares);
     _withdraw(_msgSender(), receiver, owner, assets, shares);
 
-    if (step != SaleStep.CAPITAL_REFUNDED) {
-      collectedCapital -= assets;
-      uint256 paid_ = paid[owner];
-      paid[owner] = assets >= paid_ ? 0 : paid_ - assets;
-    }
+    paid[owner] -= assets;
   }
 
   //Public View functions
