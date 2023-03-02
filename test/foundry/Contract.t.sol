@@ -91,6 +91,7 @@ contract ContractTest is Test {
             "Kon",
             "ipfs://URI",
             addr[MSIG],
+            addr[BANK],
             address(db),
             50_000 * 1e6,
             50_000 * 1e6,

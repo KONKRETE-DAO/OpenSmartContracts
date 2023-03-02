@@ -33,6 +33,9 @@ contract KonkreteVault is
       @dev AccessControl constants
  */
   bytes32 public constant KONKRETE = DEFAULT_ADMIN_ROLE;
+  /** Timelock will be a governance oriented smarcontract where Konkrete propose a future transaction (like in two weeks)  (in the case , withdraw unclaimed),
+   * that transaction have to be voted by tokenHolders or whitelisted wallet before  execution
+   */
   bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
   bytes32 public constant DEV = keccak256("DEV");
 
@@ -98,6 +101,7 @@ contract KonkreteVault is
   event VaultURIUpdated(string vaultURI_);
   event TreasuryUpdated(address oldTreasury, address newTreasury);
   event PriceUpdated(uint256 oldPrice, uint256 newPrice);
+  error ReceiverIsNullAddress();
   /**
    *****************************Errors******************************************
    */
@@ -118,7 +122,7 @@ contract KonkreteVault is
   error WrongMinDepositPerUser(uint256 maxDeposit, uint256 minInvest);
   error NegativeCapital(int256 capitalAndInterest);
   error InmpossibleInterest(int256 interest);
-
+  error InvestZeroAmount();
   error NotExpectedStep(SaleStep expected, SaleStep currentStep);
   error WrongStep(SaleStep currentStep);
   error MsgSenderUnauthorized(address msgSender);
@@ -145,6 +149,7 @@ contract KonkreteVault is
     string memory symbol_,
     string memory vaultURI_,
     address multisig,
+    address treasury_,
     IDatabase dataBase_,
     uint256 softCap_,
     uint256 hardcap_,
@@ -160,6 +165,7 @@ contract KonkreteVault is
     uint256 assetDecimals = IERC20MetadataUpgradeable(asset_).decimals();
     if (assetDecimals != 18 && assetDecimals != 6)
       revert WrongDecimalNumber(18, 6, assetDecimals);
+    if (treasury_.code.length == 0) revert WrongTreasury(treasury_);
     uint256 commonMantissa_ = 10 ** assetDecimals;
 
     _grantRole(KONKRETE, multisig);
@@ -174,7 +180,7 @@ contract KonkreteVault is
     depositsStart = depositsStart_;
     depositsStop = depositsStop_;
 
-    treasury = multisig;
+    treasury = treasury_;
     dataBase = dataBase_;
 
     maxDepositPerUser = softCap / 3;
@@ -193,8 +199,8 @@ contract KonkreteVault is
   /**@dev Check if not address 0 or treasury is a contract (mutlisig , or other)*/
   function setTreasury(address treasury_) external onlyRole(KONKRETE) {
     if (treasury_.code.length == 0) revert WrongTreasury(treasury_);
-    emit TreasuryUpdated(treasury, treasury_);
 
+    emit TreasuryUpdated(treasury, treasury_);
     treasury = treasury_;
   }
 
@@ -222,6 +228,13 @@ contract KonkreteVault is
     emit CapitalCollected(collected);
   }
 
+  error WrongRefundValue(bool isZero);
+
+  function emptyCapitalBack(bool doubleChecked) external onlyRole(KONKRETE) {
+    if (!doubleChecked) revert WrongRefundValue(false);
+    _refund(0);
+  }
+
   /**
   @notice Refund after maturity, reset price and activate withdraw
   @param capitalAndInterest is the total amount refunded at the end of maturity
@@ -231,7 +244,11 @@ contract KonkreteVault is
     SaleStep step = getStep();
     if (step != SaleStep.SALE_COMPLETE && step != SaleStep.CAPITAL_REFUNDED)
       revert WrongStep(step);
+    if (capitalAndInterest == 0) revert WrongRefundValue(true);
+    _refund(capitalAndInterest);
+  }
 
+  function _refund(uint256 capitalAndInterest) internal {
     uint256 collectedCapital_ = collectedCapital;
     if (collectedCapital_ > 0)
       IERC20(asset()).safeTransferFrom(
@@ -339,14 +356,14 @@ contract KonkreteVault is
     _unpause();
   }
 
-  /**
-  @notice Inverse of priceImpact
-   */
-  function amountImpact(
-    uint256 priceRaiseOrLower
-  ) external view returns (uint256) {
-    return priceRaiseOrLower.mulDiv(totalSupply(), commonMantissa);
-  }
+  // /**
+  // @notice Inverse of priceImpact
+  //  */
+  // function amountImpact(
+  //   uint256 priceRaiseOrLower
+  // ) external view returns (uint256) {
+  //   return priceRaiseOrLower.mulDiv(totalSupply(), commonMantissa);
+  // }
 
   /**
     @notice check the originalPrice */
@@ -372,8 +389,7 @@ contract KonkreteVault is
     uint256 assets,
     address receiver
   ) public override nonReentrant whenNotPaused returns (uint256) {
-    _invest(assets, _msgSender(), receiver);
-    return assets;
+    return _invest(assets, _msgSender(), receiver);
   }
 
   /** 
@@ -386,8 +402,7 @@ contract KonkreteVault is
     uint256 shares,
     address receiver
   ) public override nonReentrant whenNotPaused returns (uint256) {
-    _invest(shares, _msgSender(), receiver);
-    return shares;
+    return _invest(shares, _msgSender(), receiver);
   }
 
   /** @notice Withdraw amount of assets when funds are ont the contract
@@ -510,8 +525,14 @@ contract KonkreteVault is
   /** @notice Common function of mint & deposit
     Because tokenPrice will be equal to commonMantissa till the sale is not completed, functions are pretty the same.
    */
-  function _invest(uint256 amount, address sender, address receiver) internal {
+  function _invest(
+    uint256 amount,
+    address sender,
+    address receiver
+  ) internal returns (uint) {
     if (!dataBase.canBuy(sender)) revert MsgSenderUnauthorized(sender);
+    if (receiver == address(0)) revert ReceiverIsNullAddress();
+    if (amount == 0) revert InvestZeroAmount();
 
     SaleStep step = getStep();
     if (step != SaleStep.SALE) revert NotExpectedStep(SaleStep.SALE, step);
@@ -523,6 +544,7 @@ contract KonkreteVault is
     collectedCapital += amount;
 
     paid[sender] += amount;
+    return amount;
   }
 
   /** @notice Common function of collectCapital and collectUnClaimedCapital

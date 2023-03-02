@@ -35,6 +35,7 @@ contract WrongVault is
   bytes32 public constant KONKRETE = DEFAULT_ADMIN_ROLE;
   bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
   bytes32 public constant DEV = keccak256("DEV");
+  uint constant DECIMAL_FACTOR = 1e6;
 
   /**@dev commonMantissa will never changes (considered as immutable), it correspond to 1/1 asset/token 
   It  can be used as originalPrice */
@@ -126,25 +127,16 @@ contract WrongVault is
 
   constructor() initializer {}
 
-  /**
-     *****************************Constructor (initializer)******************************************
-     @dev ERC4626 standard mimic the decimals of the asset related to it.
-     In  case of a succeeded decimal call from the assets' contract.
-     by checking if decimals are not fancy , we're sure the erc4626 will copy this one.
-     That's why we can use commonMantissa.
-     @param asset_ asset used to buy tokens
-     @param name_ token name
-     @param symbol_  token symbol
-     @param multisig  Konkrete multisig ,used as Treasur for the moment
-     @param dataBase_  Nft checking if msg.sender have made his kyc
-     */
-
+  // ERROR  :
+  //Because of the constant ,
+  //we cannot use dai or agEur for a vault.
   function initialize(
     address asset_,
     string memory name_,
     string memory symbol_,
     string memory vaultURI_,
     address multisig,
+    address treasury_,
     IDatabase dataBase_,
     uint256 softCap_,
     uint256 hardcap_,
@@ -161,7 +153,6 @@ contract WrongVault is
     if (assetDecimals != 18 && assetDecimals != 6)
       revert WrongDecimalNumber(18, 6, assetDecimals);
     uint256 commonMantissa_ = 10 ** assetDecimals;
-
     _grantRole(KONKRETE, multisig);
     _grantRole(DEV, multisig);
     _grantRole(DEV, _msgSender());
@@ -174,7 +165,7 @@ contract WrongVault is
     depositsStart = depositsStart_;
     depositsStop = depositsStop_;
 
-    treasury = multisig;
+    treasury = treasury_;
     dataBase = dataBase_;
 
     maxDepositPerUser = softCap / 3;
@@ -408,7 +399,26 @@ contract WrongVault is
     require(shares <= balanceOf(owner), "ERC4626: withdraw more than max");
 
     _withdraw(_msgSender(), receiver, owner, assets, shares);
+  }
 
+  //- Comme la fonction "_withdraw" n'etait pas réecrit, il faut ajouter " paid[owner]-= assets «
+  //la condition "if (step != SaleStep.CAPITAL_REFUNDED)" est inutile , car vous imposez deja la
+  //condition " if (uint256(step) == uint256(SaleStep.SALE_COMPLETE))
+  //response
+  // collectedCapital , when withdraw occurs when refunded will reduce
+  // Which is not needed (and gas cost)
+  //CRITICAL ERROR
+  // User cannot withdraw token thay receive from others
+  // User cannot take their interest if the price raise
+  function _withdraw(
+    address caller,
+    address receiver,
+    address owner,
+    uint assets,
+    uint shares
+  ) internal override {
+    super._withdraw(caller, receiver, owner, assets, shares);
+    collectedCapital -= assets;
     paid[owner] -= assets;
   }
 
@@ -428,8 +438,6 @@ contract WrongVault is
 
     assets = previewRedeem(shares);
     _withdraw(_msgSender(), receiver, owner, assets, shares);
-
-    paid[owner] -= assets;
   }
 
   //Public View functions
@@ -560,18 +568,17 @@ contract WrongVault is
   }
 
   /**
-   * @notice Internal function to get maxDeposit() without the checks
-   * @dev @return  the smallest amount between:
-   -capedMax:  the hardcap &  collectedCapitall 's difference
-   -userMax:  the maxDepositPerUser &  already paid's difference
-    ⚠️This function is only used in deposit phase, the public maxDeposit() return 0 in others⚠️
-    We didn't used totalAssets()
-     because it doesn't make the difference between assset commited through deposits and sent by mistake)
-   */
+** fonction "_maxDeposit":
+- Dans cette fonction , vous devrez utiliser plutot "totalAssets()" au lieu de "totalSupply()".
+If somebody send stables , there's an issue.
+CRITICAL ERROR
+// If somebody send stable amount to the contract amount = hardcap - softcap + 1.
+//Sale cannot be launched !!!!
+ */
   function _maxDeposit(address user) internal view returns (uint256) {
     uint256 hardCap_ = hardCap;
 
-    uint256 collectedK_ = collectedCapital;
+    uint256 collectedK_ = totalAssets();
 
     uint256 paidByUser = paid[user];
     if (hardCap_ <= collectedK_ || maxDepositPerUser <= paidByUser) return 0;

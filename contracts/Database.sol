@@ -20,6 +20,7 @@ contract Database is AccessControl {
   /**
    *****************************Variables******************************************
    */
+  bool whitelistActivated = true;
 
   /**
    *****************************Mappings (it's okay we're on L2)******************************************
@@ -189,7 +190,9 @@ contract Database is AccessControl {
 
   // View functions
   function canBuy(address toCheck) public view returns (bool) {
-    return !cannotBuy[countryCode[toCheck]] && isWhitelisted[toCheck];
+    return
+      !cannotBuy[countryCode[toCheck]] &&
+      (!whitelistActivated || isWhitelisted[toCheck]);
   }
 
   function isKyced(address toCheck) public view returns (bool) {

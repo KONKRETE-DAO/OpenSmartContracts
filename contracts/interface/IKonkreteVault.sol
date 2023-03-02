@@ -86,6 +86,7 @@ interface IKonkreteVault is IERC4626Upgradeable, IAccessControlUpgradeable {
     string memory symbol_,
     string memory vaultURI_,
     address multisig,
+    address treasury,
     address dataBase_,
     uint256 softCap_,
     uint256 hardCap_,
