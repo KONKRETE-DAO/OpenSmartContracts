@@ -100,17 +100,17 @@
   },
   "ast": {
     "absolutePath": "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
-    "id": 29493,
+    "id": 29543,
     "exportedSymbols": {
       "IBeacon": [
-        29492
+        29542
       ]
     },
     "nodeType": "SourceUnit",
     "src": "93:357:42",
     "nodes": [
       {
-        "id": 29484,
+        "id": 29534,
         "nodeType": "PragmaDirective",
         "src": "93:23:42",
         "nodes": [],
@@ -122,17 +122,17 @@
         ]
       },
       {
-        "id": 29492,
+        "id": 29542,
         "nodeType": "ContractDefinition",
         "src": "198:251:42",
         "nodes": [
           {
-            "id": 29491,
+            "id": 29541,
             "nodeType": "FunctionDefinition",
             "src": "389:58:42",
             "nodes": [],
             "documentation": {
-              "id": 29486,
+              "id": 29536,
               "nodeType": "StructuredDocumentation",
               "src": "222:162:42",
               "text": " @dev Must return an address that can be used as a delegate call target.\n {BeaconProxy} will check that this address is a contract."
@@ -144,23 +144,23 @@
             "name": "implementation",
             "nameLocation": "398:14:42",
             "parameters": {
-              "id": 29487,
+              "id": 29537,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "412:2:42"
             },
             "returnParameters": {
-              "id": 29490,
+              "id": 29540,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 29489,
+                  "id": 29539,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 29491,
+                  "scope": 29541,
                   "src": "438:7:42",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -169,7 +169,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 29488,
+                    "id": 29538,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "438:7:42",
@@ -184,7 +184,7 @@
               ],
               "src": "437:9:42"
             },
-            "scope": 29492,
+            "scope": 29542,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
@@ -196,18 +196,18 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 29485,
+          "id": 29535,
           "nodeType": "StructuredDocumentation",
           "src": "118:79:42",
           "text": " @dev This is the interface that {BeaconProxy} expects of its beacon."
         },
         "fullyImplemented": false,
         "linearizedBaseContracts": [
-          29492
+          29542
         ],
         "name": "IBeacon",
         "nameLocation": "208:7:42",
-        "scope": 29493,
+        "scope": 29543,
         "usedErrors": []
       }
     ],

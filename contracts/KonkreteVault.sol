@@ -36,9 +36,9 @@ contract KonkreteVault is
     bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
     bytes32 public constant DEV = keccak256("DEV");
 
-    /**@dev assetMantissa will never changes (considered as immutable), it correspond to 1/1 asset/token 
+    /**@dev commonMantissa will never changes (considered as immutable), it correspond to 1/1 asset/token 
   It  can be used as originalPrice */
-    uint256 private assetMantissa;
+    uint256 private commonMantissa;
 
     /**
      *****************************Variables******************************************
@@ -156,7 +156,7 @@ contract KonkreteVault is
         uint256 assetDecimals = IERC20MetadataUpgradeable(asset_).decimals();
         if (assetDecimals != 18 && assetDecimals != 6)
             revert WrongDecimalNumber(18, 6, assetDecimals);
-        uint256 assetMantissa_ = 10**assetDecimals;
+        uint256 commonMantissa_ = 10**assetDecimals;
 
         _grantRole(KONKRETE, multisig);
         _grantRole(DEV, multisig);
@@ -174,9 +174,9 @@ contract KonkreteVault is
         dataBase = dataBase_;
 
         maxDepositPerUser = softCap / 3;
-        minInvestPerUser = 500 * assetMantissa_;
+        minInvestPerUser = 500 * commonMantissa_;
 
-        assetMantissa = tokenPrice = assetMantissa_;
+        commonMantissa = tokenPrice = commonMantissa_;
     }
 
     /**
@@ -349,13 +349,13 @@ contract KonkreteVault is
         view
         returns (uint256)
     {
-        return priceRaiseOrLower.mulDiv(totalSupply(), assetMantissa);
+        return priceRaiseOrLower.mulDiv(totalSupply(), commonMantissa);
     }
 
     /**
     @notice check the originalPrice */
     function originalPrice() external view returns (uint256) {
-        return assetMantissa;
+        return commonMantissa;
     }
 
     /**
@@ -520,14 +520,14 @@ contract KonkreteVault is
         view
         returns (uint256)
     {
-        return amountOfInterest.mulDiv(assetMantissa, totalSupply());
+        return amountOfInterest.mulDiv(commonMantissa, totalSupply());
     }
 
     /**
      *****************************Internal Functions******************************************
      */
     /** @notice Common function of mint & deposit
-    Because tokenPrice will be equal to assetMantissa till the sale is not completed, functions are pretty the same.
+    Because tokenPrice will be equal to commonMantissa till the sale is not completed, functions are pretty the same.
    */
     function _invest(
         uint256 amount,
@@ -580,7 +580,7 @@ contract KonkreteVault is
         returns (uint256 assets)
     {
         assets = shares > 0
-            ? shares.mulDiv(tokenPrice, assetMantissa, rounding)
+            ? shares.mulDiv(tokenPrice, commonMantissa, rounding)
             : 0;
     }
 
@@ -595,7 +595,7 @@ contract KonkreteVault is
         returns (uint256 shares)
     {
         shares = assets > 0
-            ? assets.mulDiv(assetMantissa, tokenPrice, rounding)
+            ? assets.mulDiv(commonMantissa, tokenPrice, rounding)
             : 0;
     }
 

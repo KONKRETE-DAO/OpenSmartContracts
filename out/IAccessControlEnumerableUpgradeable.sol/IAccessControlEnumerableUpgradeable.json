@@ -533,20 +533,20 @@
   },
   "ast": {
     "absolutePath": "node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlEnumerableUpgradeable.sol",
-    "id": 24181,
+    "id": 24231,
     "exportedSymbols": {
       "IAccessControlEnumerableUpgradeable": [
-        24180
+        24230
       ],
       "IAccessControlUpgradeable": [
-        24253
+        24303
       ]
     },
     "nodeType": "SourceUnit",
     "src": "104:1157:16",
     "nodes": [
       {
-        "id": 24157,
+        "id": 24207,
         "nodeType": "PragmaDirective",
         "src": "104:23:16",
         "nodes": [],
@@ -558,30 +558,30 @@
         ]
       },
       {
-        "id": 24158,
+        "id": 24208,
         "nodeType": "ImportDirective",
         "src": "129:41:16",
         "nodes": [],
         "absolutePath": "node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol",
         "file": "./IAccessControlUpgradeable.sol",
         "nameLocation": "-1:-1:-1",
-        "scope": 24181,
-        "sourceUnit": 24254,
+        "scope": 24231,
+        "sourceUnit": 24304,
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
-        "id": 24180,
+        "id": 24230,
         "nodeType": "ContractDefinition",
         "src": "272:988:16",
         "nodes": [
           {
-            "id": 24171,
+            "id": 24221,
             "nodeType": "FunctionDefinition",
             "src": "932:84:16",
             "nodes": [],
             "documentation": {
-              "id": 24162,
+              "id": 24212,
               "nodeType": "StructuredDocumentation",
               "src": "353:574:16",
               "text": " @dev Returns one of the accounts that have `role`. `index` must be a\n value between 0 and {getRoleMemberCount}, non-inclusive.\n Role bearers are not sorted in any particular way, and their ordering may\n change at any point.\n WARNING: When using {getRoleMember} and {getRoleMemberCount}, make sure\n you perform all queries on the same block. See the following\n https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum post]\n for more information."
@@ -593,17 +593,17 @@
             "name": "getRoleMember",
             "nameLocation": "941:13:16",
             "parameters": {
-              "id": 24167,
+              "id": 24217,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24164,
+                  "id": 24214,
                   "mutability": "mutable",
                   "name": "role",
                   "nameLocation": "963:4:16",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24171,
+                  "scope": 24221,
                   "src": "955:12:16",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -612,7 +612,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 24163,
+                    "id": 24213,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "955:7:16",
@@ -625,12 +625,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 24166,
+                  "id": 24216,
                   "mutability": "mutable",
                   "name": "index",
                   "nameLocation": "977:5:16",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24171,
+                  "scope": 24221,
                   "src": "969:13:16",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -639,7 +639,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 24165,
+                    "id": 24215,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "969:7:16",
@@ -654,17 +654,17 @@
               "src": "954:29:16"
             },
             "returnParameters": {
-              "id": 24170,
+              "id": 24220,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24169,
+                  "id": 24219,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24171,
+                  "scope": 24221,
                   "src": "1007:7:16",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -673,7 +673,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24168,
+                    "id": 24218,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1007:7:16",
@@ -688,18 +688,18 @@
               ],
               "src": "1006:9:16"
             },
-            "scope": 24180,
+            "scope": 24230,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 24179,
+            "id": 24229,
             "nodeType": "FunctionDefinition",
             "src": "1184:74:16",
             "nodes": [],
             "documentation": {
-              "id": 24172,
+              "id": 24222,
               "nodeType": "StructuredDocumentation",
               "src": "1022:157:16",
               "text": " @dev Returns the number of accounts that have `role`. Can be used\n together with {getRoleMember} to enumerate all bearers of a role."
@@ -711,17 +711,17 @@
             "name": "getRoleMemberCount",
             "nameLocation": "1193:18:16",
             "parameters": {
-              "id": 24175,
+              "id": 24225,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24174,
+                  "id": 24224,
                   "mutability": "mutable",
                   "name": "role",
                   "nameLocation": "1220:4:16",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24179,
+                  "scope": 24229,
                   "src": "1212:12:16",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -730,7 +730,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 24173,
+                    "id": 24223,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "1212:7:16",
@@ -745,17 +745,17 @@
               "src": "1211:14:16"
             },
             "returnParameters": {
-              "id": 24178,
+              "id": 24228,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24177,
+                  "id": 24227,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24179,
+                  "scope": 24229,
                   "src": "1249:7:16",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -764,7 +764,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 24176,
+                    "id": 24226,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1249:7:16",
@@ -778,7 +778,7 @@
               ],
               "src": "1248:9:16"
             },
-            "scope": 24180,
+            "scope": 24230,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
@@ -788,13 +788,13 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 24160,
+              "id": 24210,
               "name": "IAccessControlUpgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 24253,
+              "referencedDeclaration": 24303,
               "src": "321:25:16"
             },
-            "id": 24161,
+            "id": 24211,
             "nodeType": "InheritanceSpecifier",
             "src": "321:25:16"
           }
@@ -803,19 +803,19 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 24159,
+          "id": 24209,
           "nodeType": "StructuredDocumentation",
           "src": "172:99:16",
           "text": " @dev External interface of AccessControlEnumerable declared to support ERC165 detection."
         },
         "fullyImplemented": false,
         "linearizedBaseContracts": [
-          24180,
-          24253
+          24230,
+          24303
         ],
         "name": "IAccessControlEnumerableUpgradeable",
         "nameLocation": "282:35:16",
-        "scope": 24181,
+        "scope": 24231,
         "usedErrors": []
       }
     ],
