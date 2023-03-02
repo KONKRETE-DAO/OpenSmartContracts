@@ -128,6 +128,10 @@ contract KonkreteVault is
 
     /**
      *****************************Constructor (initializer)******************************************
+     @dev ERC4626 standard mimic the decimals of the asset related to it.
+     In  case of a succeeded decimal call from the assets' contract.
+     by checking if decimals are not fancy , we're sure the erc4626 will copy this one.
+     That's why we can use commonMantissa.
      @param asset_ asset used to buy tokens
      @param name_ token name
      @param symbol_  token symbol
@@ -600,11 +604,13 @@ contract KonkreteVault is
     }
 
     /**
-    ⚠️This function is only used in deposit phase, the public maxDeposit() return 0 in others⚠️
    * @notice Internal function to get maxDeposit() without the checks
    * @dev @return  the smallest amount between:
    -capedMax:  the hardcap &  collectedCapitall 's difference
    -userMax:  the maxDepositPerUser &  already paid's difference
+    ⚠️This function is only used in deposit phase, the public maxDeposit() return 0 in others⚠️
+    We didn't used totalAssets()
+     because it doesn't make the difference between assset commited through deposits and sent by mistake)
    */
     function _maxDeposit(address user) internal view returns (uint256) {
         uint256 hardCap_ = hardCap;
