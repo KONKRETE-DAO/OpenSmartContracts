@@ -57,7 +57,6 @@ contract ContractTest is Test {
     uint32 Friday = Monday + 4 days;
     uint32 Saturday = Monday + 5 days;
     uint32 Sunday = Monday + 6 days;
-    Database public db = new Database(addr[MSIG]);
     Treasury public trez = new Treasury();
 
     address[6] addr = [
@@ -68,7 +67,8 @@ contract ContractTest is Test {
         address(trez),
         vm.addr(6)
     ];
-
+    address[] sig = [address(this)];
+    Database public db = new Database(addr[MSIG], sig);
     uint256 public constant MAX = type(uint256).max;
 
     ERC20DecimalsMock public usdc = new ERC20DecimalsMock("USDC", "USDC", 6);
@@ -77,6 +77,7 @@ contract ContractTest is Test {
 
     uint256 public usdcMantissa = 1e6;
     uint256 public agEurMantissa = 1e18;
+    // Buyer[] buyers;
     address[] addresses;
     uint256 amountToMintPerUser = 1e4;
     ProxyAdmin public adminProxy = new ProxyAdmin();
@@ -91,6 +92,7 @@ contract ContractTest is Test {
             "ipfs://URI",
             addr[MSIG],
             address(db),
+            50_000 * 1e6,
             50_000 * 1e6,
             StartDate,
             StopDate

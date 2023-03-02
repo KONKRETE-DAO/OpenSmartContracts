@@ -292,11 +292,11 @@ contract KonkreteVault is
     function setTimes(uint256 start, uint256 stop) external onlyRole(DEV) {
         SaleStep step = getStep();
         if (uint256(step) > 2) revert WrongStep(step);
-        if (start == 0 || start > stop || start < block.timestamp)
+        if (start > stop || start < block.timestamp)
             revert WrongSaleTimeStamps();
-        emit TimesUpdated(start, stop);
         depositsStart = start;
         depositsStop = stop;
+        emit TimesUpdated(start, stop);
     }
 
     function setCaps(uint256 soft, uint256 hard) external onlyRole(DEV) {
@@ -422,7 +422,7 @@ contract KonkreteVault is
             collectedCapital -= assets;
             if (owner == receiver) {
                 uint256 paid_ = paid[owner];
-                paid[owner] = assets > paid_ ? 0 : paid_ - assets;
+                paid[owner] = assets >= paid_ ? 0 : paid_ - assets;
             }
         }
     }
@@ -448,7 +448,7 @@ contract KonkreteVault is
             collectedCapital -= assets;
             if (owner == receiver) {
                 uint256 paid_ = paid[owner];
-                paid[owner] = assets > paid_ ? 0 : paid_ - assets;
+                paid[owner] = assets >= paid_ ? 0 : paid_ - assets;
             }
         }
     }
@@ -600,21 +600,23 @@ contract KonkreteVault is
     }
 
     /**
+    ⚠️This function is only used in deposit phase, the public maxDeposit() return 0 in others⚠️
    * @notice Internal function to get maxDeposit() without the checks
    * @dev @return  the smallest amount between:
-   -capedMax:  the hardcap &  totalSupply's difference
+   -capedMax:  the hardcap &  collectedCapitall 's difference
    -userMax:  the maxDepositPerUser &  already paid's difference
    */
     function _maxDeposit(address user) internal view returns (uint256) {
         uint256 hardCap_ = hardCap;
 
-        uint256 ts = totalSupply();
+        uint256 collectedK_ = collectedCapital;
 
         uint256 paidByUser = paid[user];
-        if (hardCap_ <= ts || maxDepositPerUser <= paidByUser) return 0;
+        if (hardCap_ <= collectedK_ || maxDepositPerUser <= paidByUser)
+            return 0;
 
         uint256 userMax = maxDepositPerUser - paidByUser;
-        uint256 capedMax = hardCap_ - ts;
+        uint256 capedMax = hardCap_ - collectedK_;
 
         return userMax > capedMax ? capedMax : userMax;
     }
