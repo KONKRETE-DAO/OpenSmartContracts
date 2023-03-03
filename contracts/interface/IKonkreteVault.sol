@@ -110,6 +110,8 @@ interface IKonkreteVault is IERC4626Upgradeable, IAccessControlUpgradeable {
     uint256 amountOfInterest
   ) external view returns (uint256);
 
+  function emptyCapitalBack(bool doubleChecked) external;
+
   function refundCapital(uint capital_) external;
 
   function refunded() external view returns (bool);

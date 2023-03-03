@@ -1,0 +1,113 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220b9bcf60b683912d1905b78b7865504ae96f3ebf0cf096e3994e480f0fb3bd15164736f6c634300080e0033",
+    "sourceMap": "65:20:0:-:0;;;;;;;;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x6080604052600080fdfea2646970667358221220b9bcf60b683912d1905b78b7865504ae96f3ebf0cf096e3994e480f0fb3bd15164736f6c634300080e0033",
+    "sourceMap": "65:20:0:-:0;;;;;",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {},
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Contract.sol\":\"Contract\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":@rari-capital/=node_modules/@rari-capital/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/Contract.sol\":{\"keccak256\":\"0x88c53f90b24a07c57711738987ddc81838a43c4ab7b6ce2986f1b470500ebe86\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://58178e99c552a2042318a4be96c35abdda48f5a1537a5c5c27c234b5dda43f2f\",\"dweb:/ipfs/QmTgVWYsTQyBx7PsNtmUaryTF27cjLQseyk4sxYGChd5ui\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.14+commit.80d49f37"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":@rari-capital/=node_modules/@rari-capital/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/Contract.sol": "Contract"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/Contract.sol": {
+        "keccak256": "0x88c53f90b24a07c57711738987ddc81838a43c4ab7b6ce2986f1b470500ebe86",
+        "urls": [
+          "bzz-raw://58178e99c552a2042318a4be96c35abdda48f5a1537a5c5c27c234b5dda43f2f",
+          "dweb:/ipfs/QmTgVWYsTQyBx7PsNtmUaryTF27cjLQseyk4sxYGChd5ui"
+        ],
+        "license": "UNLICENSED"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/Contract.sol",
+    "id": 3,
+    "exportedSymbols": {
+      "Contract": [
+        2
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "39:47:0",
+    "nodes": [
+      {
+        "id": 1,
+        "nodeType": "PragmaDirective",
+        "src": "39:24:0",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".13"
+        ]
+      },
+      {
+        "id": 2,
+        "nodeType": "ContractDefinition",
+        "src": "65:20:0",
+        "nodes": [],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "Contract",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          2
+        ],
+        "name": "Contract",
+        "nameLocation": "74:8:0",
+        "scope": 3,
+        "usedErrors": []
+      }
+    ],
+    "license": "UNLICENSED"
+  },
+  "id": 0
+}
