@@ -221,6 +221,7 @@ contract KonkreteVault is
 
     function emptyCapitalBack(bool doubleChecked) external onlyRole(KONKRETE) {
         if (!doubleChecked) revert WrongRefundValue(false);
+        SaleStep step = getStep();
         if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
         _refund(0);
     }
