@@ -296,13 +296,15 @@ contract KonkreteVault is
         external
         onlyRole(DEV)
     {
-        uint256 softCap_ = stepVar.softCap;
+        StepVar memory stepVar_ = stepVar;
+        uint256 softCap_ = stepVar_.softCap;
         if (maxDeposit_ > softCap_)
             revert WrongMaxDepositPerUser(softCap_, maxDeposit_);
         if (minInvest_ >= maxDeposit_)
             revert WrongMaxDepositPerUser(softCap_, minInvest_);
-        stepVar.maxDepositPerUser = maxDeposit_;
-        stepVar.minInvestPerUser = minInvest_;
+        stepVar_.maxDepositPerUser = maxDeposit_;
+        stepVar_.minInvestPerUser = minInvest_;
+        stepVar = stepVar_;
     }
 
     /** 
@@ -626,12 +628,11 @@ contract KonkreteVault is
      because it doesn't make the difference between assset commited through deposits and sent by mistake)
    */
     function _maxDeposit(address user) internal view returns (uint256) {
-        uint256 hardCap_ = stepVar.hardCap;
+        (, , , , uint128 hardCap_, uint128 maxDepositPerUser_, ) = this
+            .stepVar();
+        uint128 collectedK_ = uint128(collectedCapital);
+        uint128 paidByUser = uint128(paid[user]);
 
-        uint256 collectedK_ = collectedCapital;
-        uint256 maxDepositPerUser_ = uint256(stepVar.maxDepositPerUser);
-
-        uint256 paidByUser = paid[user];
         if (hardCap_ <= collectedK_ || maxDepositPerUser_ <= paidByUser)
             return 0;
 
