@@ -15,6 +15,15 @@ enum SaleStep {
   SALE_FAILED,
   CAPITAL_REFUNDED
 }
+struct StepVar {
+  bool refunded;
+  uint32 depositsStart;
+  uint32 depositsStop;
+  uint128 softCap;
+  uint128 hardCap;
+  uint128 maxDepositPerUser;
+  uint128 minInvestPerUser;
+}
 
 interface IKonkreteVault is IERC4626Upgradeable, IAccessControlUpgradeable {
   error DecimalOverFlow();
@@ -88,10 +97,10 @@ interface IKonkreteVault is IERC4626Upgradeable, IAccessControlUpgradeable {
     address multisig,
     address treasury,
     address dataBase_,
-    uint256 softCap_,
-    uint256 hardCap_,
-    uint256 depositsStart_,
-    uint256 depositsStop_
+    uint128 softCap_,
+    uint128 hardCap_,
+    uint32 depositsStart_,
+    uint32 depositsStop_
   ) external;
 
   function maxDepositPerUser() external view returns (uint256);
@@ -116,16 +125,16 @@ interface IKonkreteVault is IERC4626Upgradeable, IAccessControlUpgradeable {
 
   function refunded() external view returns (bool);
 
-  function setCaps(uint256 soft, uint256 hard) external;
+  function setCaps(uint128 soft, uint128 hard) external;
 
   function setDatabase(address database_) external;
 
   function setDepositLimitsPerUser(
-    uint256 minDeposit_,
-    uint maxDeposit_
+    uint128 minDeposit_,
+    uint128 maxDeposit_
   ) external;
 
-  function setTimes(uint256 start, uint256 stop) external;
+  function setTimes(uint32 start, uint32 stop) external;
 
   function setTreasury(address treasury_) external;
 

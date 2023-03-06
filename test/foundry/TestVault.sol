@@ -17,13 +17,13 @@ contract KonVaulSimpleTest is ContractTest {
     int256 multiplierx100 = int256(multiplierx100_);
     if (amounts < stableMantissa) amounts += uint64(stableMantissa);
     if (multiplierx100 > 200) multiplierx100 %= 200;
+    // if (multiplierx100 < -100) multiplierx100 %= 100;
     vm.assume(multiplierx100 >= -100);
-    softCap = softCapMultiplier / 10 > 0
-      ? uint256(amounts) * 2
-      : uint256(amounts) * 3;
-    vault.setCaps(softCap, MAX);
+    softCap = softCapMultiplier > 10 ? uint(amounts) * 2 : uint(amounts) * 3;
+
+    vault.setCaps(uint128(softCap), uint128(type(uint128).max));
     multipleInvestments(amounts);
-    console.logUint(vault.tokenPrice());
+    // console.logUint(vault.tokenPrice());
 
     vm.warp(StopDate);
     if (vault.getStep() == 3) withdrawAfterFail();
@@ -62,7 +62,7 @@ contract KonVaulSimpleTest is ContractTest {
   function multipleInvestments(uint128 amounts) internal {
     vm.warp(StartDate);
     uint256 hc = softCap * 2;
-    vault.setDepositLimitsPerUser(1, softCap);
+    vault.setDepositLimitsPerUser(1, uint128(softCap));
     vm.prank(addr[0]);
     vault.mint(amounts, addr[0]);
     vm.prank(addr[1]);
