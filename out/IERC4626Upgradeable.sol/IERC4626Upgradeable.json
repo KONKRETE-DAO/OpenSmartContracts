@@ -1410,23 +1410,23 @@
   },
   "ast": {
     "absolutePath": "node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC4626Upgradeable.sol",
-    "id": 26054,
+    "id": 26050,
     "exportedSymbols": {
       "IERC20MetadataUpgradeable": [
-        27843
+        27839
       ],
       "IERC20Upgradeable": [
-        27112
+        27108
       ],
       "IERC4626Upgradeable": [
-        26053
+        26049
       ]
     },
     "nodeType": "SourceUnit",
     "src": "107:12184:19",
     "nodes": [
       {
-        "id": 25887,
+        "id": 25883,
         "nodeType": "PragmaDirective",
         "src": "107:23:19",
         "nodes": [],
@@ -1438,38 +1438,38 @@
         ]
       },
       {
-        "id": 25888,
+        "id": 25884,
         "nodeType": "ImportDirective",
         "src": "132:46:19",
         "nodes": [],
         "absolutePath": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
         "file": "../token/ERC20/IERC20Upgradeable.sol",
         "nameLocation": "-1:-1:-1",
-        "scope": 26054,
-        "sourceUnit": 27113,
+        "scope": 26050,
+        "sourceUnit": 27109,
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
-        "id": 25889,
+        "id": 25885,
         "nodeType": "ImportDirective",
         "src": "179:65:19",
         "nodes": [],
         "absolutePath": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
         "file": "../token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
         "nameLocation": "-1:-1:-1",
-        "scope": 26054,
-        "sourceUnit": 27844,
+        "scope": 26050,
+        "sourceUnit": 27840,
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
-        "id": 26053,
+        "id": 26049,
         "nodeType": "ContractDefinition",
         "src": "413:11877:19",
         "nodes": [
           {
-            "id": 25904,
+            "id": 25900,
             "nodeType": "EventDefinition",
             "src": "497:93:19",
             "nodes": [],
@@ -1478,18 +1478,18 @@
             "name": "Deposit",
             "nameLocation": "503:7:19",
             "parameters": {
-              "id": 25903,
+              "id": 25899,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25896,
+                  "id": 25892,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "sender",
                   "nameLocation": "527:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25904,
+                  "scope": 25900,
                   "src": "511:22:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1498,7 +1498,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25895,
+                    "id": 25891,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "511:7:19",
@@ -1512,13 +1512,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25898,
+                  "id": 25894,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "owner",
                   "nameLocation": "551:5:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25904,
+                  "scope": 25900,
                   "src": "535:21:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1527,7 +1527,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25897,
+                    "id": 25893,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "535:7:19",
@@ -1541,13 +1541,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25900,
+                  "id": 25896,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "566:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25904,
+                  "scope": 25900,
                   "src": "558:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1556,7 +1556,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25899,
+                    "id": 25895,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "558:7:19",
@@ -1569,13 +1569,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25902,
+                  "id": 25898,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "582:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25904,
+                  "scope": 25900,
                   "src": "574:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1584,7 +1584,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25901,
+                    "id": 25897,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "574:7:19",
@@ -1600,7 +1600,7 @@
             }
           },
           {
-            "id": 25916,
+            "id": 25912,
             "nodeType": "EventDefinition",
             "src": "596:166:19",
             "nodes": [],
@@ -1609,18 +1609,18 @@
             "name": "Withdraw",
             "nameLocation": "602:8:19",
             "parameters": {
-              "id": 25915,
+              "id": 25911,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25906,
+                  "id": 25902,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "sender",
                   "nameLocation": "636:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25916,
+                  "scope": 25912,
                   "src": "620:22:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1629,7 +1629,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25905,
+                    "id": 25901,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "620:7:19",
@@ -1643,13 +1643,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25908,
+                  "id": 25904,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "668:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25916,
+                  "scope": 25912,
                   "src": "652:24:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1658,7 +1658,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25907,
+                    "id": 25903,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "652:7:19",
@@ -1672,13 +1672,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25910,
+                  "id": 25906,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "owner",
                   "nameLocation": "702:5:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25916,
+                  "scope": 25912,
                   "src": "686:21:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1687,7 +1687,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25909,
+                    "id": 25905,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "686:7:19",
@@ -1701,13 +1701,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25912,
+                  "id": 25908,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "725:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25916,
+                  "scope": 25912,
                   "src": "717:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1716,7 +1716,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25911,
+                    "id": 25907,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "717:7:19",
@@ -1729,13 +1729,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 25914,
+                  "id": 25910,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "749:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25916,
+                  "scope": 25912,
                   "src": "741:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1744,7 +1744,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25913,
+                    "id": 25909,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "741:7:19",
@@ -1760,12 +1760,12 @@
             }
           },
           {
-            "id": 25922,
+            "id": 25918,
             "nodeType": "FunctionDefinition",
             "src": "980:67:19",
             "nodes": [],
             "documentation": {
-              "id": 25917,
+              "id": 25913,
               "nodeType": "StructuredDocumentation",
               "src": "768:207:19",
               "text": " @dev Returns the address of the underlying token used for the Vault for accounting, depositing, and withdrawing.\n - MUST be an ERC-20 token contract.\n - MUST NOT revert."
@@ -1777,23 +1777,23 @@
             "name": "asset",
             "nameLocation": "989:5:19",
             "parameters": {
-              "id": 25918,
+              "id": 25914,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "994:2:19"
             },
             "returnParameters": {
-              "id": 25921,
+              "id": 25917,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25920,
+                  "id": 25916,
                   "mutability": "mutable",
                   "name": "assetTokenAddress",
                   "nameLocation": "1028:17:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25922,
+                  "scope": 25918,
                   "src": "1020:25:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1802,7 +1802,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25919,
+                    "id": 25915,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1020:7:19",
@@ -1817,18 +1817,18 @@
               ],
               "src": "1019:27:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25928,
+            "id": 25924,
             "nodeType": "FunctionDefinition",
             "src": "1344:74:19",
             "nodes": [],
             "documentation": {
-              "id": 25923,
+              "id": 25919,
               "nodeType": "StructuredDocumentation",
               "src": "1053:286:19",
               "text": " @dev Returns the total amount of the underlying asset that is “managed” by Vault.\n - SHOULD include any compounding that occurs from yield.\n - MUST be inclusive of any fees that are charged against assets in the Vault.\n - MUST NOT revert."
@@ -1840,23 +1840,23 @@
             "name": "totalAssets",
             "nameLocation": "1353:11:19",
             "parameters": {
-              "id": 25924,
+              "id": 25920,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1364:2:19"
             },
             "returnParameters": {
-              "id": 25927,
+              "id": 25923,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25926,
+                  "id": 25922,
                   "mutability": "mutable",
                   "name": "totalManagedAssets",
                   "nameLocation": "1398:18:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25928,
+                  "scope": 25924,
                   "src": "1390:26:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1865,7 +1865,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25925,
+                    "id": 25921,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1390:7:19",
@@ -1879,18 +1879,18 @@
               ],
               "src": "1389:28:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25936,
+            "id": 25932,
             "nodeType": "FunctionDefinition",
             "src": "2149:80:19",
             "nodes": [],
             "documentation": {
-              "id": 25929,
+              "id": 25925,
               "nodeType": "StructuredDocumentation",
               "src": "1424:720:19",
               "text": " @dev Returns the amount of shares that the Vault would exchange for the amount of assets provided, in an ideal\n scenario where all the conditions are met.\n - MUST NOT be inclusive of any fees that are charged against assets in the Vault.\n - MUST NOT show any variations depending on the caller.\n - MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.\n - MUST NOT revert.\n NOTE: This calculation MAY NOT reflect the “per-user” price-per-share, and instead should reflect the\n “average-user’s” price-per-share, meaning what the average user should expect to see when exchanging to and\n from."
@@ -1902,17 +1902,17 @@
             "name": "convertToShares",
             "nameLocation": "2158:15:19",
             "parameters": {
-              "id": 25932,
+              "id": 25928,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25931,
+                  "id": 25927,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "2182:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25936,
+                  "scope": 25932,
                   "src": "2174:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1921,7 +1921,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25930,
+                    "id": 25926,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "2174:7:19",
@@ -1936,17 +1936,17 @@
               "src": "2173:16:19"
             },
             "returnParameters": {
-              "id": 25935,
+              "id": 25931,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25934,
+                  "id": 25930,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "2221:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25936,
+                  "scope": 25932,
                   "src": "2213:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1955,7 +1955,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25933,
+                    "id": 25929,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "2213:7:19",
@@ -1969,18 +1969,18 @@
               ],
               "src": "2212:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25944,
+            "id": 25940,
             "nodeType": "FunctionDefinition",
             "src": "2960:80:19",
             "nodes": [],
             "documentation": {
-              "id": 25937,
+              "id": 25933,
               "nodeType": "StructuredDocumentation",
               "src": "2235:720:19",
               "text": " @dev Returns the amount of assets that the Vault would exchange for the amount of shares provided, in an ideal\n scenario where all the conditions are met.\n - MUST NOT be inclusive of any fees that are charged against assets in the Vault.\n - MUST NOT show any variations depending on the caller.\n - MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.\n - MUST NOT revert.\n NOTE: This calculation MAY NOT reflect the “per-user” price-per-share, and instead should reflect the\n “average-user’s” price-per-share, meaning what the average user should expect to see when exchanging to and\n from."
@@ -1992,17 +1992,17 @@
             "name": "convertToAssets",
             "nameLocation": "2969:15:19",
             "parameters": {
-              "id": 25940,
+              "id": 25936,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25939,
+                  "id": 25935,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "2993:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25944,
+                  "scope": 25940,
                   "src": "2985:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2011,7 +2011,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25938,
+                    "id": 25934,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "2985:7:19",
@@ -2026,17 +2026,17 @@
               "src": "2984:16:19"
             },
             "returnParameters": {
-              "id": 25943,
+              "id": 25939,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25942,
+                  "id": 25938,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "3032:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25944,
+                  "scope": 25940,
                   "src": "3024:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2045,7 +2045,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25941,
+                    "id": 25937,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "3024:7:19",
@@ -2059,18 +2059,18 @@
               ],
               "src": "3023:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25952,
+            "id": 25948,
             "nodeType": "FunctionDefinition",
             "src": "3437:80:19",
             "nodes": [],
             "documentation": {
-              "id": 25945,
+              "id": 25941,
               "nodeType": "StructuredDocumentation",
               "src": "3046:386:19",
               "text": " @dev Returns the maximum amount of the underlying asset that can be deposited into the Vault for the receiver,\n through a deposit call.\n - MUST return a limited value if receiver is subject to some deposit limit.\n - MUST return 2 ** 256 - 1 if there is no limit on the maximum amount of assets that may be deposited.\n - MUST NOT revert."
@@ -2082,17 +2082,17 @@
             "name": "maxDeposit",
             "nameLocation": "3446:10:19",
             "parameters": {
-              "id": 25948,
+              "id": 25944,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25947,
+                  "id": 25943,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "3465:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25952,
+                  "scope": 25948,
                   "src": "3457:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2101,7 +2101,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25946,
+                    "id": 25942,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "3457:7:19",
@@ -2117,17 +2117,17 @@
               "src": "3456:18:19"
             },
             "returnParameters": {
-              "id": 25951,
+              "id": 25947,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25950,
+                  "id": 25946,
                   "mutability": "mutable",
                   "name": "maxAssets",
                   "nameLocation": "3506:9:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25952,
+                  "scope": 25948,
                   "src": "3498:17:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2136,7 +2136,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25949,
+                    "id": 25945,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "3498:7:19",
@@ -2150,18 +2150,18 @@
               ],
               "src": "3497:19:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25960,
+            "id": 25956,
             "nodeType": "FunctionDefinition",
             "src": "4540:79:19",
             "nodes": [],
             "documentation": {
-              "id": 25953,
+              "id": 25949,
               "nodeType": "StructuredDocumentation",
               "src": "3523:1012:19",
               "text": " @dev Allows an on-chain or off-chain user to simulate the effects of their deposit at the current block, given\n current on-chain conditions.\n - MUST return as close to and no more than the exact amount of Vault shares that would be minted in a deposit\n   call in the same transaction. I.e. deposit should return the same or more shares as previewDeposit if called\n   in the same transaction.\n - MUST NOT account for deposit limits like those returned from maxDeposit and should always act as though the\n   deposit would be accepted, regardless if the user has enough tokens approved, etc.\n - MUST be inclusive of deposit fees. Integrators should be aware of the existence of deposit fees.\n - MUST NOT revert.\n NOTE: any unfavorable discrepancy between convertToShares and previewDeposit SHOULD be considered slippage in\n share price or some other type of condition, meaning the depositor will lose assets by depositing."
@@ -2173,17 +2173,17 @@
             "name": "previewDeposit",
             "nameLocation": "4549:14:19",
             "parameters": {
-              "id": 25956,
+              "id": 25952,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25955,
+                  "id": 25951,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "4572:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25960,
+                  "scope": 25956,
                   "src": "4564:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2192,7 +2192,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25954,
+                    "id": 25950,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "4564:7:19",
@@ -2207,17 +2207,17 @@
               "src": "4563:16:19"
             },
             "returnParameters": {
-              "id": 25959,
+              "id": 25955,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25958,
+                  "id": 25954,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "4611:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25960,
+                  "scope": 25956,
                   "src": "4603:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2226,7 +2226,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25957,
+                    "id": 25953,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "4603:7:19",
@@ -2240,18 +2240,18 @@
               ],
               "src": "4602:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25970,
+            "id": 25966,
             "nodeType": "FunctionDefinition",
             "src": "5281:85:19",
             "nodes": [],
             "documentation": {
-              "id": 25961,
+              "id": 25957,
               "nodeType": "StructuredDocumentation",
               "src": "4625:651:19",
               "text": " @dev Mints shares Vault shares to receiver by depositing exactly amount of underlying tokens.\n - MUST emit the Deposit event.\n - MAY support an additional flow in which the underlying tokens are owned by the Vault contract before the\n   deposit execution, and are accounted for during deposit.\n - MUST revert if all of assets cannot be deposited (due to deposit limit being reached, slippage, the user not\n   approving enough underlying tokens to the Vault contract, etc).\n NOTE: most implementations will require pre-approval of the Vault with the Vault’s underlying asset token."
@@ -2263,17 +2263,17 @@
             "name": "deposit",
             "nameLocation": "5290:7:19",
             "parameters": {
-              "id": 25966,
+              "id": 25962,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25963,
+                  "id": 25959,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "5306:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25970,
+                  "scope": 25966,
                   "src": "5298:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2282,7 +2282,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25962,
+                    "id": 25958,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "5298:7:19",
@@ -2295,12 +2295,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 25965,
+                  "id": 25961,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "5322:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25970,
+                  "scope": 25966,
                   "src": "5314:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2309,7 +2309,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25964,
+                    "id": 25960,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "5314:7:19",
@@ -2325,17 +2325,17 @@
               "src": "5297:34:19"
             },
             "returnParameters": {
-              "id": 25969,
+              "id": 25965,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25968,
+                  "id": 25964,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "5358:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25970,
+                  "scope": 25966,
                   "src": "5350:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2344,7 +2344,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25967,
+                    "id": 25963,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "5350:7:19",
@@ -2358,18 +2358,18 @@
               ],
               "src": "5349:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25978,
+            "id": 25974,
             "nodeType": "FunctionDefinition",
             "src": "5718:77:19",
             "nodes": [],
             "documentation": {
-              "id": 25971,
+              "id": 25967,
               "nodeType": "StructuredDocumentation",
               "src": "5372:341:19",
               "text": " @dev Returns the maximum amount of the Vault shares that can be minted for the receiver, through a mint call.\n - MUST return a limited value if receiver is subject to some mint limit.\n - MUST return 2 ** 256 - 1 if there is no limit on the maximum amount of shares that may be minted.\n - MUST NOT revert."
@@ -2381,17 +2381,17 @@
             "name": "maxMint",
             "nameLocation": "5727:7:19",
             "parameters": {
-              "id": 25974,
+              "id": 25970,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25973,
+                  "id": 25969,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "5743:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25978,
+                  "scope": 25974,
                   "src": "5735:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2400,7 +2400,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25972,
+                    "id": 25968,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "5735:7:19",
@@ -2416,17 +2416,17 @@
               "src": "5734:18:19"
             },
             "returnParameters": {
-              "id": 25977,
+              "id": 25973,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25976,
+                  "id": 25972,
                   "mutability": "mutable",
                   "name": "maxShares",
                   "nameLocation": "5784:9:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25978,
+                  "scope": 25974,
                   "src": "5776:17:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2435,7 +2435,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25975,
+                    "id": 25971,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "5776:7:19",
@@ -2449,18 +2449,18 @@
               ],
               "src": "5775:19:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25986,
+            "id": 25982,
             "nodeType": "FunctionDefinition",
             "src": "6790:76:19",
             "nodes": [],
             "documentation": {
-              "id": 25979,
+              "id": 25975,
               "nodeType": "StructuredDocumentation",
               "src": "5801:984:19",
               "text": " @dev Allows an on-chain or off-chain user to simulate the effects of their mint at the current block, given\n current on-chain conditions.\n - MUST return as close to and no fewer than the exact amount of assets that would be deposited in a mint call\n   in the same transaction. I.e. mint should return the same or fewer assets as previewMint if called in the\n   same transaction.\n - MUST NOT account for mint limits like those returned from maxMint and should always act as though the mint\n   would be accepted, regardless if the user has enough tokens approved, etc.\n - MUST be inclusive of deposit fees. Integrators should be aware of the existence of deposit fees.\n - MUST NOT revert.\n NOTE: any unfavorable discrepancy between convertToAssets and previewMint SHOULD be considered slippage in\n share price or some other type of condition, meaning the depositor will lose assets by minting."
@@ -2472,17 +2472,17 @@
             "name": "previewMint",
             "nameLocation": "6799:11:19",
             "parameters": {
-              "id": 25982,
+              "id": 25978,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25981,
+                  "id": 25977,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "6819:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25986,
+                  "scope": 25982,
                   "src": "6811:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2491,7 +2491,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25980,
+                    "id": 25976,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "6811:7:19",
@@ -2506,17 +2506,17 @@
               "src": "6810:16:19"
             },
             "returnParameters": {
-              "id": 25985,
+              "id": 25981,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25984,
+                  "id": 25980,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "6858:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25986,
+                  "scope": 25982,
                   "src": "6850:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2525,7 +2525,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25983,
+                    "id": 25979,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "6850:7:19",
@@ -2539,18 +2539,18 @@
               ],
               "src": "6849:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 25996,
+            "id": 25992,
             "nodeType": "FunctionDefinition",
             "src": "7519:82:19",
             "nodes": [],
             "documentation": {
-              "id": 25987,
+              "id": 25983,
               "nodeType": "StructuredDocumentation",
               "src": "6872:642:19",
               "text": " @dev Mints exactly shares Vault shares to receiver by depositing amount of underlying tokens.\n - MUST emit the Deposit event.\n - MAY support an additional flow in which the underlying tokens are owned by the Vault contract before the mint\n   execution, and are accounted for during mint.\n - MUST revert if all of shares cannot be minted (due to deposit limit being reached, slippage, the user not\n   approving enough underlying tokens to the Vault contract, etc).\n NOTE: most implementations will require pre-approval of the Vault with the Vault’s underlying asset token."
@@ -2562,17 +2562,17 @@
             "name": "mint",
             "nameLocation": "7528:4:19",
             "parameters": {
-              "id": 25992,
+              "id": 25988,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25989,
+                  "id": 25985,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "7541:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25996,
+                  "scope": 25992,
                   "src": "7533:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2581,7 +2581,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25988,
+                    "id": 25984,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "7533:7:19",
@@ -2594,12 +2594,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 25991,
+                  "id": 25987,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "7557:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25996,
+                  "scope": 25992,
                   "src": "7549:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2608,7 +2608,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25990,
+                    "id": 25986,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "7549:7:19",
@@ -2624,17 +2624,17 @@
               "src": "7532:34:19"
             },
             "returnParameters": {
-              "id": 25995,
+              "id": 25991,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25994,
+                  "id": 25990,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "7593:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 25996,
+                  "scope": 25992,
                   "src": "7585:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2643,7 +2643,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 25993,
+                    "id": 25989,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "7585:7:19",
@@ -2657,18 +2657,18 @@
               ],
               "src": "7584:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 26004,
+            "id": 26000,
             "nodeType": "FunctionDefinition",
             "src": "7905:78:19",
             "nodes": [],
             "documentation": {
-              "id": 25997,
+              "id": 25993,
               "nodeType": "StructuredDocumentation",
               "src": "7607:293:19",
               "text": " @dev Returns the maximum amount of the underlying asset that can be withdrawn from the owner balance in the\n Vault, through a withdraw call.\n - MUST return a limited value if owner is subject to some withdrawal limit or timelock.\n - MUST NOT revert."
@@ -2680,17 +2680,17 @@
             "name": "maxWithdraw",
             "nameLocation": "7914:11:19",
             "parameters": {
-              "id": 26000,
+              "id": 25996,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 25999,
+                  "id": 25995,
                   "mutability": "mutable",
                   "name": "owner",
                   "nameLocation": "7934:5:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26004,
+                  "scope": 26000,
                   "src": "7926:13:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2699,7 +2699,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 25998,
+                    "id": 25994,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "7926:7:19",
@@ -2715,17 +2715,17 @@
               "src": "7925:15:19"
             },
             "returnParameters": {
-              "id": 26003,
+              "id": 25999,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26002,
+                  "id": 25998,
                   "mutability": "mutable",
                   "name": "maxAssets",
                   "nameLocation": "7972:9:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26004,
+                  "scope": 26000,
                   "src": "7964:17:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2734,7 +2734,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26001,
+                    "id": 25997,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "7964:7:19",
@@ -2748,18 +2748,18 @@
               ],
               "src": "7963:19:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 26012,
+            "id": 26008,
             "nodeType": "FunctionDefinition",
             "src": "9028:80:19",
             "nodes": [],
             "documentation": {
-              "id": 26005,
+              "id": 26001,
               "nodeType": "StructuredDocumentation",
               "src": "7989:1034:19",
               "text": " @dev Allows an on-chain or off-chain user to simulate the effects of their withdrawal at the current block,\n given current on-chain conditions.\n - MUST return as close to and no fewer than the exact amount of Vault shares that would be burned in a withdraw\n   call in the same transaction. I.e. withdraw should return the same or fewer shares as previewWithdraw if\n   called\n   in the same transaction.\n - MUST NOT account for withdrawal limits like those returned from maxWithdraw and should always act as though\n   the withdrawal would be accepted, regardless if the user has enough shares, etc.\n - MUST be inclusive of withdrawal fees. Integrators should be aware of the existence of withdrawal fees.\n - MUST NOT revert.\n NOTE: any unfavorable discrepancy between convertToShares and previewWithdraw SHOULD be considered slippage in\n share price or some other type of condition, meaning the depositor will lose assets by depositing."
@@ -2771,17 +2771,17 @@
             "name": "previewWithdraw",
             "nameLocation": "9037:15:19",
             "parameters": {
-              "id": 26008,
+              "id": 26004,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26007,
+                  "id": 26003,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "9061:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26012,
+                  "scope": 26008,
                   "src": "9053:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2790,7 +2790,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26006,
+                    "id": 26002,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "9053:7:19",
@@ -2805,17 +2805,17 @@
               "src": "9052:16:19"
             },
             "returnParameters": {
-              "id": 26011,
+              "id": 26007,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26010,
+                  "id": 26006,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "9100:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26012,
+                  "scope": 26008,
                   "src": "9092:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2824,7 +2824,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26009,
+                    "id": 26005,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "9092:7:19",
@@ -2838,18 +2838,18 @@
               ],
               "src": "9091:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 26024,
+            "id": 26020,
             "nodeType": "FunctionDefinition",
             "src": "9789:131:19",
             "nodes": [],
             "documentation": {
-              "id": 26013,
+              "id": 26009,
               "nodeType": "StructuredDocumentation",
               "src": "9114:670:19",
               "text": " @dev Burns shares from owner and sends exactly assets of underlying tokens to receiver.\n - MUST emit the Withdraw event.\n - MAY support an additional flow in which the underlying tokens are owned by the Vault contract before the\n   withdraw execution, and are accounted for during withdraw.\n - MUST revert if all of assets cannot be withdrawn (due to withdrawal limit being reached, slippage, the owner\n   not having enough shares, etc).\n Note that some implementations will require pre-requesting to the Vault before a withdrawal may be performed.\n Those methods should be performed separately."
@@ -2861,17 +2861,17 @@
             "name": "withdraw",
             "nameLocation": "9798:8:19",
             "parameters": {
-              "id": 26020,
+              "id": 26016,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26015,
+                  "id": 26011,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "9824:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26024,
+                  "scope": 26020,
                   "src": "9816:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2880,7 +2880,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26014,
+                    "id": 26010,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "9816:7:19",
@@ -2893,12 +2893,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 26017,
+                  "id": 26013,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "9848:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26024,
+                  "scope": 26020,
                   "src": "9840:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2907,7 +2907,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 26016,
+                    "id": 26012,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "9840:7:19",
@@ -2921,12 +2921,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 26019,
+                  "id": 26015,
                   "mutability": "mutable",
                   "name": "owner",
                   "nameLocation": "9874:5:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26024,
+                  "scope": 26020,
                   "src": "9866:13:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2935,7 +2935,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 26018,
+                    "id": 26014,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "9866:7:19",
@@ -2951,17 +2951,17 @@
               "src": "9806:79:19"
             },
             "returnParameters": {
-              "id": 26023,
+              "id": 26019,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26022,
+                  "id": 26018,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "9912:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26024,
+                  "scope": 26020,
                   "src": "9904:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2970,7 +2970,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26021,
+                    "id": 26017,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "9904:7:19",
@@ -2984,18 +2984,18 @@
               ],
               "src": "9903:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 26032,
+            "id": 26028,
             "nodeType": "FunctionDefinition",
             "src": "10312:76:19",
             "nodes": [],
             "documentation": {
-              "id": 26025,
+              "id": 26021,
               "nodeType": "StructuredDocumentation",
               "src": "9926:381:19",
               "text": " @dev Returns the maximum amount of Vault shares that can be redeemed from the owner balance in the Vault,\n through a redeem call.\n - MUST return a limited value if owner is subject to some withdrawal limit or timelock.\n - MUST return balanceOf(owner) if owner is not subject to any withdrawal limit or timelock.\n - MUST NOT revert."
@@ -3007,17 +3007,17 @@
             "name": "maxRedeem",
             "nameLocation": "10321:9:19",
             "parameters": {
-              "id": 26028,
+              "id": 26024,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26027,
+                  "id": 26023,
                   "mutability": "mutable",
                   "name": "owner",
                   "nameLocation": "10339:5:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26032,
+                  "scope": 26028,
                   "src": "10331:13:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3026,7 +3026,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 26026,
+                    "id": 26022,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "10331:7:19",
@@ -3042,17 +3042,17 @@
               "src": "10330:15:19"
             },
             "returnParameters": {
-              "id": 26031,
+              "id": 26027,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26030,
+                  "id": 26026,
                   "mutability": "mutable",
                   "name": "maxShares",
                   "nameLocation": "10377:9:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26032,
+                  "scope": 26028,
                   "src": "10369:17:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3061,7 +3061,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26029,
+                    "id": 26025,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "10369:7:19",
@@ -3075,18 +3075,18 @@
               ],
               "src": "10368:19:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 26040,
+            "id": 26036,
             "nodeType": "FunctionDefinition",
             "src": "11409:78:19",
             "nodes": [],
             "documentation": {
-              "id": 26033,
+              "id": 26029,
               "nodeType": "StructuredDocumentation",
               "src": "10394:1010:19",
               "text": " @dev Allows an on-chain or off-chain user to simulate the effects of their redeemption at the current block,\n given current on-chain conditions.\n - MUST return as close to and no more than the exact amount of assets that would be withdrawn in a redeem call\n   in the same transaction. I.e. redeem should return the same or more assets as previewRedeem if called in the\n   same transaction.\n - MUST NOT account for redemption limits like those returned from maxRedeem and should always act as though the\n   redemption would be accepted, regardless if the user has enough shares, etc.\n - MUST be inclusive of withdrawal fees. Integrators should be aware of the existence of withdrawal fees.\n - MUST NOT revert.\n NOTE: any unfavorable discrepancy between convertToAssets and previewRedeem SHOULD be considered slippage in\n share price or some other type of condition, meaning the depositor will lose assets by redeeming."
@@ -3098,17 +3098,17 @@
             "name": "previewRedeem",
             "nameLocation": "11418:13:19",
             "parameters": {
-              "id": 26036,
+              "id": 26032,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26035,
+                  "id": 26031,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "11440:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26040,
+                  "scope": 26036,
                   "src": "11432:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3117,7 +3117,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26034,
+                    "id": 26030,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "11432:7:19",
@@ -3132,17 +3132,17 @@
               "src": "11431:16:19"
             },
             "returnParameters": {
-              "id": 26039,
+              "id": 26035,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26038,
+                  "id": 26034,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "11479:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26040,
+                  "scope": 26036,
                   "src": "11471:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3151,7 +3151,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26037,
+                    "id": 26033,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "11471:7:19",
@@ -3165,18 +3165,18 @@
               ],
               "src": "11470:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "id": 26052,
+            "id": 26048,
             "nodeType": "FunctionDefinition",
             "src": "12159:129:19",
             "nodes": [],
             "documentation": {
-              "id": 26041,
+              "id": 26037,
               "nodeType": "StructuredDocumentation",
               "src": "11493:661:19",
               "text": " @dev Burns exactly shares from owner and sends assets of underlying tokens to receiver.\n - MUST emit the Withdraw event.\n - MAY support an additional flow in which the underlying tokens are owned by the Vault contract before the\n   redeem execution, and are accounted for during redeem.\n - MUST revert if all of shares cannot be redeemed (due to withdrawal limit being reached, slippage, the owner\n   not having enough shares, etc).\n NOTE: some implementations will require pre-requesting to the Vault before a withdrawal may be performed.\n Those methods should be performed separately."
@@ -3188,17 +3188,17 @@
             "name": "redeem",
             "nameLocation": "12168:6:19",
             "parameters": {
-              "id": 26048,
+              "id": 26044,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26043,
+                  "id": 26039,
                   "mutability": "mutable",
                   "name": "shares",
                   "nameLocation": "12192:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26052,
+                  "scope": 26048,
                   "src": "12184:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3207,7 +3207,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26042,
+                    "id": 26038,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "12184:7:19",
@@ -3220,12 +3220,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 26045,
+                  "id": 26041,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "12216:8:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26052,
+                  "scope": 26048,
                   "src": "12208:16:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3234,7 +3234,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 26044,
+                    "id": 26040,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "12208:7:19",
@@ -3248,12 +3248,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 26047,
+                  "id": 26043,
                   "mutability": "mutable",
                   "name": "owner",
                   "nameLocation": "12242:5:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26052,
+                  "scope": 26048,
                   "src": "12234:13:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3262,7 +3262,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 26046,
+                    "id": 26042,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "12234:7:19",
@@ -3278,17 +3278,17 @@
               "src": "12174:79:19"
             },
             "returnParameters": {
-              "id": 26051,
+              "id": 26047,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 26050,
+                  "id": 26046,
                   "mutability": "mutable",
                   "name": "assets",
                   "nameLocation": "12280:6:19",
                   "nodeType": "VariableDeclaration",
-                  "scope": 26052,
+                  "scope": 26048,
                   "src": "12272:14:19",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3297,7 +3297,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 26049,
+                    "id": 26045,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "12272:7:19",
@@ -3311,7 +3311,7 @@
               ],
               "src": "12271:16:19"
             },
-            "scope": 26053,
+            "scope": 26049,
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -3321,25 +3321,25 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 25891,
+              "id": 25887,
               "name": "IERC20Upgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 27112,
+              "referencedDeclaration": 27108,
               "src": "446:17:19"
             },
-            "id": 25892,
+            "id": 25888,
             "nodeType": "InheritanceSpecifier",
             "src": "446:17:19"
           },
           {
             "baseName": {
-              "id": 25893,
+              "id": 25889,
               "name": "IERC20MetadataUpgradeable",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 27843,
+              "referencedDeclaration": 27839,
               "src": "465:25:19"
             },
-            "id": 25894,
+            "id": 25890,
             "nodeType": "InheritanceSpecifier",
             "src": "465:25:19"
           }
@@ -3348,20 +3348,20 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 25890,
+          "id": 25886,
           "nodeType": "StructuredDocumentation",
           "src": "246:166:19",
           "text": " @dev Interface of the ERC4626 \"Tokenized Vault Standard\", as defined in\n https://eips.ethereum.org/EIPS/eip-4626[ERC-4626].\n _Available since v4.7._"
         },
         "fullyImplemented": false,
         "linearizedBaseContracts": [
-          26053,
-          27843,
-          27112
+          26049,
+          27839,
+          27108
         ],
         "name": "IERC4626Upgradeable",
         "nameLocation": "423:19:19",
-        "scope": 26054,
+        "scope": 26050,
         "usedErrors": []
       }
     ],

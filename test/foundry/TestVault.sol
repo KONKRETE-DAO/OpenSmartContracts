@@ -61,7 +61,7 @@ contract KonVaulSimpleTest is ContractTest {
 
   function multipleInvestments(uint128 amounts) internal {
     vm.warp(StartDate);
-    uint256 hc = softCap * 2;
+
     vault.setDepositLimitsPerUser(1, softCap);
     vm.prank(addr[0]);
     vault.mint(amounts, addr[0]);
@@ -75,7 +75,6 @@ contract KonVaulSimpleTest is ContractTest {
   ) internal {
     vm.prank(addr[BANK]);
     int256 collectedCapital = int256(vault.collectCapital());
-    uint256 ts = vault.totalSupply();
 
     bool multiplierEqual0 = int256(multiplierx100) == int256(0);
     bool collectedEqual0 = collectedCapital == int256(0);
@@ -135,10 +134,6 @@ contract KonVaulSimpleTest is ContractTest {
   }
 
   function withdrawAfterFail() internal {
-    uint256 tokenBal0Before = vault.balanceOf(addr[0]);
-    uint256 tokenBal1Before = vault.balanceOf(addr[1]);
-    uint256 stableBal0Before = usdc.balanceOf(addr[0]);
-    uint256 stableBal1Before = usdc.balanceOf(addr[1]);
     uint256 maxRedeem0 = vault.maxRedeem(addr[0]);
     uint256 maxWithdraw1 = vault.maxWithdraw(addr[1]);
     require(maxRedeem0 == maxWithdraw1, "Redeem and withdraw are different");
