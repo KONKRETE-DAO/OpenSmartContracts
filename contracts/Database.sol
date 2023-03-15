@@ -2,13 +2,13 @@
 pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 /**
 @title Database is the kyc and whitelist handler of the v1.
 * this version is on l2 so we prefered to use mappings instead of less plastic merkle root.
  */
-contract Database is AccessControl {
+contract Database is AccessControlEnumerable {
   /**
    *****************************Constants******************************************
    */
@@ -20,7 +20,7 @@ contract Database is AccessControl {
   /**
    *****************************Variables******************************************
    */
-  bool whitelistActivated = true;
+  bool public whitelistActivated = true;
 
   /**
    *****************************Mappings (it's okay we're on L2)******************************************
@@ -182,6 +182,16 @@ contract Database is AccessControl {
 
   function revokeWhitelist(address toUnWhitelist) external onlyRole(DEV) {
     isWhitelisted[toUnWhitelist] = false;
+  }
+
+  function activateWhitelist() external onlyRole(DEV) {
+    require(!whitelistActivated, "WL: already activated");
+    whitelistActivated = true;
+  }
+
+  function deactivateWhitelis() external onlyRole(DEV) {
+    require(whitelistActivated, "WL: already deactivated");
+    whitelistActivated = false;
   }
 
   /**

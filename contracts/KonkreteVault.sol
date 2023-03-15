@@ -331,15 +331,6 @@ contract KonkreteVault is
     _unpause();
   }
 
-  // /**
-  // @notice Inverse of priceImpact
-  //  */
-  // function amountImpact(
-  //   uint256 priceRaiseOrLower
-  // ) external view returns (uint256) {
-  //   return priceRaiseOrLower.mulDiv(totalSupply(), commonMantissa);
-  // }
-
   /**
     @notice check the originalPrice */
   function originalPrice() external view returns (uint256) {
