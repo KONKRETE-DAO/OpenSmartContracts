@@ -31,10 +31,7 @@ contract CheckMantissa is ContractTest {
             )
         );
         require(vault18.decimals() == stable18.decimals(), "Decimals differ");
-        require(
-            vault18.originalPrice() == 10**stable18.decimals(),
-            "Wrong mantissa/original price"
-        );
+        require(vault18.originalPrice() == 10 ** stable18.decimals(), "Wrong mantissa/original price");
     }
 
     function test6Decimals() public {
@@ -65,10 +62,7 @@ contract CheckMantissa is ContractTest {
             )
         );
         require(vault6.decimals() == stable6.decimals(), "Decimals differ");
-        require(
-            vault6.originalPrice() == 10**stable6.decimals(),
-            "Wrong mantissa/original price"
-        );
+        require(vault6.originalPrice() == 10 ** stable6.decimals(), "Wrong mantissa/original price");
     }
 
     function testFailOthersDecimals(uint8 decimals) public {

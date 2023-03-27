@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "./interface/IKonkreteVault.sol";
+import "./interface/IVaultWithInterest.sol";
 import "./interface/IDatabase.sol";
 
 /**
@@ -17,7 +17,7 @@ import "./interface/IDatabase.sol";
  * After  sale is completed , the funds are locked till refund.
  * This version is on l2 so we balanced the readability and  gas optimization
  */
-contract KonkreteVault is
+contract KonkreteVaultV2 is
     ERC4626Upgradeable,
     AccessControlEnumerableUpgradeable,
     ReentrancyGuardUpgradeable,
@@ -27,17 +27,16 @@ contract KonkreteVault is
     using MathUpgradeable for int256;
     using SafeERC20 for IERC20;
 
-    /**
-     * Constants******************************************
-     */
+    ///Constants******************************************
+
     /**
      * @dev AccessControl constants
      */
     bytes32 public constant KONKRETE = DEFAULT_ADMIN_ROLE;
-    /**
-     * Timelock will be a governance oriented smarcontract where Konkrete propose a future transaction (like in two weeks)  (in the case , withdraw unclaimed),
-     * that transaction have to be voted by tokenHolders or whitelisted wallet before  execution
-     */
+
+    /*
+    Timelock will be a governance oriented smarcontract where Konkrete propose a future transaction (like in two weeks)  (in the case , withdraw unclaimed),
+    that transaction have to be voted by tokenHolders or whitelisted wallet before  execution*/
     bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
     bytes32 public constant DEV = keccak256("DEV");
 
@@ -47,9 +46,7 @@ contract KonkreteVault is
      */
     uint256 private commonMantissa;
 
-    /**
-     * Variables******************************************
-     */
+    /// Variables******************************************
 
     /**
      * @notice Check if an address is whitelisted and kyced (In a non forbidden country)
@@ -74,42 +71,34 @@ contract KonkreteVault is
     uint256 public hardCap;
 
     /// @notice Price raises artifically , following the interests, every update from the R.W.A.It's reajusted with the total refund.
-    uint256 public tokenPrice; // Its a uint  price with decimals.
+    uint256 public tokenPrice;
 
     uint256 public collectedCapital;
 
     string public vaultURI;
 
-    /**
-     * Mappings******************************************
-     */
+    /// Mappings******************************************
 
     mapping(address => uint256) public paid;
 
-    /**
-     * Events******************************************
-     */
-    event TotalRefunded(address from, uint256 amount);
-    event InterestUpdated(address from, int256 amount);
+    /// Events******************************************
+
     event UnclaimedFundsCollected(uint256 amount);
     event CapitalCollected(uint256 amount);
     event CapitalLoss(uint256 originalCapital, uint256 remainingCapital, uint256 loss);
     event InterestRefunded(uint256 refunded);
     event CapitalRefunded(uint256 amount, uint256 collected);
-
+    event DepositLimitsupdated(uint256, uint256);
     event TimesUpdated(uint256 depositsStart, uint256 depositsStop);
     event CapsUpdated(uint256 softCap, uint256 hardCap);
     event VaultURIUpdated(string vaultURI_);
     event TreasuryUpdated(address oldTreasury, address newTreasury);
     event PriceUpdated(uint256 oldPrice, uint256 newPrice);
+    /// Errors******************************************
 
     error ReceiverIsNullAddress();
-    /**
-     * Errors******************************************
-     */
     error WrongDecimalNumber(uint256 expected1, uint256 expected2, uint256 current);
     error BelowMinimumInvest(uint256 minimum, uint256 amount);
-
     error WrongSaleTimeStamps();
     error TryToCollectZeroFund();
     error WrongCaps();
@@ -118,13 +107,11 @@ contract KonkreteVault is
     error WrongVaultURI(string vaultURI_);
     error WrongMaxDepositPerUser(uint256 max, uint256 amountWanted);
     error WrongMinDepositPerUser(uint256 maxDeposit, uint256 minInvest);
-    error NegativeCapital(int256 capitalAndInterest);
-    error InmpossibleInterest(int256 interest);
     error InvestZeroAmount();
     error NotExpectedStep(SaleStep expected, SaleStep currentStep);
     error WrongStep(SaleStep currentStep);
     error MsgSenderUnauthorized(address msgSender);
-    error ReceiverUnauthorized(address receiver);
+    error WrongRefundValue(bool isZero);
 
     constructor() initializer {}
 
@@ -138,7 +125,9 @@ contract KonkreteVault is
      *  @param name_ token name
      *  @param symbol_  token symbol
      *  @param multisig  Konkrete multisig ,used as Treasur for the moment
-     *  @param dataBase_  Nft checking if msg.sender have made his kyc
+     *  @param dataBase_  Check if msg.sender have made is kyc
+     *  @param softCap_  Minimum amount asked by konkrete
+     *  @param hardCap_  Max Cap reacheable in deposit phase
      */
 
     function initialize(
@@ -150,7 +139,7 @@ contract KonkreteVault is
         address treasury_,
         IDatabase dataBase_,
         uint256 softCap_,
-        uint256 hardcap_,
+        uint256 hardCap_,
         uint256 depositsStart_,
         uint256 depositsStop_
     ) external initializer {
@@ -174,7 +163,7 @@ contract KonkreteVault is
         vaultURI = vaultURI_;
 
         softCap = softCap_;
-        hardCap = hardcap_;
+        hardCap = hardCap_;
 
         depositsStart = depositsStart_;
         depositsStop = depositsStop_;
@@ -193,10 +182,8 @@ contract KonkreteVault is
      */
     /**
      * External Write functions
-     *    @notice accessControlled  functions
-     *   /
-     *
-     *   /**@dev Check if not address 0 or treasury is a contract (mutlisig , or other)
+     * @notice accessControlled  functions
+     * @dev Check if not address 0 or treasury is a contract (mutlisig , or other)
      */
     function setTreasury(address treasury_) external onlyRole(KONKRETE) {
         if (treasury_.code.length == 0) revert WrongTreasury(treasury_);
@@ -204,8 +191,6 @@ contract KonkreteVault is
         emit TreasuryUpdated(treasury, treasury_);
         treasury = treasury_;
     }
-
-    // TIMELOCK functions
 
     /**
      * @notice Reddeem unclaimed assets after a certain time (seedphrase lost, forgotten, asset sent by mistake etc...)
@@ -221,60 +206,39 @@ contract KonkreteVault is
      * @dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
      */
     function collectCapital() external returns (uint256 collected) {
+        require(!isCapitalCollected, "Capital already collected");
         address treasury_ = treasury;
         if (_msgSender() != treasury_) revert WrongTreasury(_msgSender());
+
         collected = _collect(SaleStep.SALE_COMPLETE);
+        isCapitalCollected = true;
+
         emit CapitalCollected(collected);
     }
 
-    error WrongRefundValue(bool isZero);
-
     function emptyCapitalBack(bool doubleChecked) external onlyRole(KONKRETE) {
         if (!doubleChecked) revert WrongRefundValue(false);
-        _refund(0);
+
+        _refund(0, 0);
     }
 
     /**
      * @notice Refund after maturity, reset price and activate withdraw
-     *   @param capitalAndInterest is the total amount refunded at the end of maturity
      */
-    function refundCapital(uint256 capitalAndInterest) external {
-        if (capitalAndInterest == 0) revert WrongRefundValue(true);
+    function refundCapitalAndInterest(uint256 capital, uint256 interest) external {
+        require(capital > 0, " capital equal 0");
+
+        if (capital == 0) revert WrongRefundValue(true);
         if (_msgSender() != treasury) revert WrongTreasury(_msgSender());
 
-        _refund(capitalAndInterest);
+        _refund(capital, interest);
 
-        IERC20(asset()).safeTransferFrom(_msgSender(), address(this), capitalAndInterest);
-    }
-
-    /**
-     * @notice  This function just raise the price artificially with price impact of the theoric raw interest
-     * @dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
-     */
-
-    function updateInterest(int256 interest) external onlyRole(DEV) {
-        SaleStep step = getStep();
-        if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
-        uint256 oldPrice = tokenPrice;
-        uint256 newPrice;
-        if (interest < 0) {
-            uint256 decrement = priceImpact(uint256(-interest));
-            if (decrement > oldPrice) revert InmpossibleInterest(interest);
-            newPrice = oldPrice - decrement;
-            emit InterestUpdated(_msgSender(), interest);
-        } else {
-            uint256 increment = priceImpact(uint256(interest));
-            newPrice = oldPrice + increment;
-            emit InterestUpdated(_msgSender(), interest);
-        }
-
-        tokenPrice = newPrice;
-
-        emit PriceUpdated(oldPrice, newPrice);
+        IERC20(asset()).safeTransferFrom(_msgSender(), address(this), capital + interest);
     }
 
     function setDatabase(IDatabase database_) external onlyRole(DEV) {
         if (!database_.isDatabase()) revert WrongDatabase();
+
         dataBase = database_;
     }
 
@@ -282,15 +246,19 @@ contract KonkreteVault is
         SaleStep step = getStep();
         if (uint256(step) > 2) revert WrongStep(step);
         if (start > stop || start < block.timestamp) revert WrongSaleTimeStamps();
+
         depositsStart = start;
         depositsStop = stop;
+
         emit TimesUpdated(start, stop);
     }
 
     function setCaps(uint256 soft, uint256 hard) external onlyRole(DEV) {
         if (soft == 0 || soft > hard) revert WrongCaps();
+
         softCap = soft;
         hardCap = hard;
+
         emit CapsUpdated(soft, hard);
     }
 
@@ -302,8 +270,11 @@ contract KonkreteVault is
         if (minInvest_ >= maxDeposit_) {
             revert WrongMaxDepositPerUser(softCap_, minInvest_);
         }
+
         maxDepositPerUser = maxDeposit_;
         minInvestPerUser = minInvest_;
+
+        emit DepositLimitsupdated(minInvest_, maxDeposit_);
     }
 
     /**
@@ -326,7 +297,7 @@ contract KonkreteVault is
     }
 
     /**
-     * @notice check the originalPrice
+     * @notice check the originalPrice (1 * 10e decimals)
      */
     function originalPrice() external view returns (uint256) {
         return commonMantissa;
@@ -377,14 +348,15 @@ contract KonkreteVault is
         returns (uint256 shares)
     {
         SaleStep step = getStep();
-        if (uint256(step) == uint256(SaleStep.SALE_COMPLETE)) {
-            revert WrongStep(step);
-        }
         shares = previewWithdraw(assets);
-        require(shares <= balanceOf(owner), "ERC4626: withdraw more than max");
+        uint256 max = step == SaleStep.SALE_COMPLETE
+            ? _maxInterestWithdraw(owner)
+            : _convertToAssets(balanceOf(owner), MathUpgradeable.Rounding.Down);
+        require(assets <= max, "ERC4626: withdraw more than max");
 
         _withdraw(_msgSender(), receiver, owner, assets, shares);
-        if (step != SaleStep.CAPITAL_REFUNDED) {
+
+        if (uint256(step) <= uint256(SaleStep.SALE)) {
             collectedCapital -= assets;
             uint256 paid_ = paid[owner];
             paid[owner] = assets >= paid_ ? 0 : paid_ - assets;
@@ -403,16 +375,13 @@ contract KonkreteVault is
         returns (uint256 assets)
     {
         SaleStep step = getStep();
-        if (uint256(step) == uint256(SaleStep.SALE_COMPLETE)) {
-            revert WrongStep(step);
-        }
-
-        require(shares <= balanceOf(owner), "ERC4626: redeem more than max");
+        uint256 max = step == SaleStep.SALE_COMPLETE ? _maxInterestRedeem(owner) : balanceOf(owner);
+        require(shares <= max, "ERC4626: redeem more than max");
 
         assets = previewRedeem(shares);
         _withdraw(_msgSender(), receiver, owner, assets, shares);
 
-        if (step != SaleStep.CAPITAL_REFUNDED) {
+        if (uint256(step) <= uint256(SaleStep.SALE)) {
             collectedCapital -= assets;
             uint256 paid_ = paid[owner];
             paid[owner] = assets >= paid_ ? 0 : paid_ - assets;
@@ -420,6 +389,7 @@ contract KonkreteVault is
     }
 
     //Public View functions
+
     function minInvest(address user) public view returns (uint256) {
         uint256 userPaid = paid[user];
         uint256 minInvestPerUser_ = minInvestPerUser;
@@ -450,7 +420,7 @@ contract KonkreteVault is
      *   @dev Same changes as maxDeposit
      */
     function maxRedeem(address owner) public view override returns (uint256) {
-        return getStep() == SaleStep.SALE_COMPLETE ? 0 : balanceOf(owner);
+        return getStep() != SaleStep.SALE_COMPLETE ? balanceOf(owner) : _maxInterestRedeem(owner);
     }
 
     /**
@@ -458,8 +428,9 @@ contract KonkreteVault is
      *   @dev Same changes as maxDeposit
      */
     function maxWithdraw(address owner) public view override returns (uint256) {
-        return
-            getStep() == SaleStep.SALE_COMPLETE ? 0 : _convertToAssets(balanceOf(owner), MathUpgradeable.Rounding.Down);
+        return getStep() != SaleStep.SALE_COMPLETE
+            ? _convertToAssets(balanceOf(owner), MathUpgradeable.Rounding.Down)
+            : _maxInterestWithdraw(owner);
     }
 
     /**
@@ -523,6 +494,7 @@ contract KonkreteVault is
     }
 
     //Internal View functions
+
     /**
      * @notice Overrides the ERC4626 function check the amount of asset you can get d with a certain amount of share
      * @param shares share = vaultToken amount
@@ -537,10 +509,7 @@ contract KonkreteVault is
         assets = shares > 0 ? shares.mulDiv(tokenPrice, commonMantissa, rounding) : 0;
     }
 
-    /**
-     * @notice Same as _convertToAssets but the input and output are reversed
-     */
-
+    ///@notice Same as _convertToAssets but the input and output are reversed
     function _convertToShares(uint256 assets, MathUpgradeable.Rounding rounding)
         internal
         view
@@ -550,23 +519,28 @@ contract KonkreteVault is
         shares = assets > 0 ? assets.mulDiv(commonMantissa, tokenPrice, rounding) : 0;
     }
 
-    function _refund(uint256 capitalAndInterest) internal {
+    function _refund(uint256 capitalRefunded, uint256 interest) internal {
         SaleStep step = getStep();
         if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
         uint256 collectedCapital_ = collectedCapital;
+        bool capitalShrinked = capitalRefunded < collectedCapital_;
 
-        int256 interest = int256(capitalAndInterest) - int256(collectedCapital_);
+        require(
+            capitalRefunded == collectedCapital || (capitalShrinked && interest == 0),
+            "Wrong dissociation between capital and interest"
+        );
+
         uint256 oldPrice = tokenPrice;
-        uint256 newPrice = priceImpact(capitalAndInterest);
-
+        uint256 newPrice = priceImpact(capitalRefunded + interest);
         tokenPrice = newPrice;
+
         refunded = true;
 
-        emit CapitalRefunded(capitalAndInterest, collectedCapital_);
-        if (interest < 0) {
-            emit CapitalLoss(collectedCapital_, capitalAndInterest, uint256(-interest));
+        emit CapitalRefunded(capitalRefunded, collectedCapital_);
+        if (capitalShrinked) {
+            emit CapitalLoss(collectedCapital_, capitalRefunded, collectedCapital_ - capitalRefunded);
         } else if (interest > 0) {
-            emit InterestRefunded(uint256(interest));
+            emit InterestRefunded(interest);
         }
         emit PriceUpdated(oldPrice, newPrice);
     }
@@ -577,20 +551,60 @@ contract KonkreteVault is
      *    -capedMax:  the hardcap &  collectedCapitall 's difference
      *    -userMax:  the maxDepositPerUser &  already paid's difference
      * ⚠️This function is only used in deposit phase, the public maxDeposit() return 0 in others⚠️
-     * We didn't used totalAssets()
-     *  because it doesn't make the difference between assset commited through deposits and sent by mistake)
+     * We did not use the totalAssets() method because it does not differentiate between assets committed through deposits and assets sent to the
+     * security leak).
      */
     function _maxDeposit(address user) internal view returns (uint256) {
         uint256 hardCap_ = hardCap;
-
         uint256 collectedK_ = collectedCapital;
-
         uint256 paidByUser = paid[user];
+
         if (hardCap_ <= collectedK_ || maxDepositPerUser <= paidByUser) return 0;
 
         uint256 userMax = maxDepositPerUser - paidByUser;
         uint256 capedMax = hardCap_ - collectedK_;
 
         return userMax > capedMax ? capedMax : userMax;
+    }
+
+    ///Contract Upgrade****************************************************************************
+
+    /// We use capital collected to avoid people withdrawing their funds before the protocol got it
+    bool isCapitalCollected;
+
+    function refundInterest(uint256 interest) external {
+        if (_msgSender() != treasury) revert WrongTreasury(_msgSender());
+        SaleStep step = getStep();
+
+        if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
+        IERC20(asset()).safeTransferFrom(_msgSender(), address(this), interest);
+
+        uint256 oldPrice = tokenPrice;
+        uint256 newPrice = oldPrice + priceImpact(interest);
+
+        tokenPrice = newPrice;
+        emit InterestRefunded(interest);
+        emit PriceUpdated(oldPrice, newPrice);
+    }
+
+    /* Both of these function is a maxWithdraw calculateion only called when step is equal to SALE_COMPLETED
+    To withdraw thei interest if needed */
+    function _maxInterestWithdraw(address user) internal view returns (uint256) {
+        if (!isCapitalCollected) return 0;
+
+        uint256 userMax = _convertToAssets(balanceOf(user), MathUpgradeable.Rounding.Down);
+        uint256 totalProtocolAsset_ = totalAssets();
+
+        return userMax > totalProtocolAsset_ ? totalProtocolAsset_ : userMax;
+    }
+
+    function _maxInterestRedeem(address user) internal view returns (uint256) {
+        if (!isCapitalCollected) return 0;
+
+        uint256 userMax = balanceOf(user);
+
+        uint256 totalProtocolAsseConverted = _convertToShares(totalAssets(), MathUpgradeable.Rounding.Down);
+
+        return userMax > totalProtocolAsseConverted ? totalProtocolAsseConverted : userMax;
     }
 }

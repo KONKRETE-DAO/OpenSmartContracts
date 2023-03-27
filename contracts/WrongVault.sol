@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
+
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC4626Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
@@ -9,583 +10,572 @@ import "./interface/IKonkreteVault.sol";
 import "./interface/IDatabase.sol";
 
 /**
-@title KonkreteVault is the vault made for the v1.
-He's upgradable and pausable in case of emergency/upgrades.
-Since the capital and interest are refunded at the end of maturity ,
-the price raise is check every time we've got the confirmation of the interest from the investment fund.
-After  sale is completed , the funds are locked till refund.
-This version is on l2 so we balanced the readability and  gas optimization
+ * @title KonkreteVault is the vault made for the v1.
+ * He's upgradable and pausable in case of emergency/upgrades.
+ * Since the capital and interest are refunded at the end of maturity ,
+ * the price raise is check every time we've got the confirmation of the interest from the investment fund.
+ * After  sale is completed , the funds are locked till refund.
+ * This version is on l2 so we balanced the readability and  gas optimization
  */
 contract WrongVault is
-  ERC4626Upgradeable,
-  AccessControlEnumerableUpgradeable,
-  ReentrancyGuardUpgradeable,
-  PausableUpgradeable
+    ERC4626Upgradeable,
+    AccessControlEnumerableUpgradeable,
+    ReentrancyGuardUpgradeable,
+    PausableUpgradeable
 {
-  using MathUpgradeable for uint256;
-  using MathUpgradeable for int256;
-  using SafeERC20 for IERC20;
+    using MathUpgradeable for uint256;
+    using MathUpgradeable for int256;
+    using SafeERC20 for IERC20;
 
-  /**
-   *****************************Constants******************************************
-   */
-  /**
-      @dev AccessControl constants
- */
-  bytes32 public constant KONKRETE = DEFAULT_ADMIN_ROLE;
-  bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
-  bytes32 public constant DEV = keccak256("DEV");
-  uint constant DECIMAL_FACTOR = 1e6;
+    /**
+     * Constants******************************************
+     */
+    /**
+     * @dev AccessControl constants
+     */
+    bytes32 public constant KONKRETE = DEFAULT_ADMIN_ROLE;
+    bytes32 public constant TIMELOCK = keccak256("TIMELOCK");
+    bytes32 public constant DEV = keccak256("DEV");
+    uint256 constant DECIMAL_FACTOR = 1e6;
 
-  /**@dev commonMantissa will never changes (considered as immutable), it correspond to 1/1 asset/token 
-  It  can be used as originalPrice */
-  uint256 private commonMantissa;
+    /**
+     * @dev commonMantissa will never changes (considered as immutable), it correspond to 1/1 asset/token
+     *   It  can be used as originalPrice
+     */
+    uint256 private commonMantissa;
 
-  /**
-   *****************************Variables******************************************
-   */
+    /**
+     * Variables******************************************
+     */
 
-  /**
-  @notice Check if an address is whitelisted and kyced (In a non forbidden country)
-  -canBuy -> returns a boolean]
-  check {./interface/IDatabase.sol}*/
-  IDatabase public dataBase;
+    /**
+     * @notice Check if an address is whitelisted and kyced (In a non forbidden country)
+     *   -canBuy -> returns a boolean]
+     *   check {./interface/IDatabase.sol}
+     */
+    IDatabase public dataBase;
 
-  address public treasury;
+    address public treasury;
 
-  bool public refunded;
+    bool public refunded;
 
-  uint256 public depositsStart;
-  uint256 public depositsStop;
+    uint256 public depositsStart;
+    uint256 public depositsStop;
 
-  uint256 public maxDepositPerUser;
-  uint256 public minInvestPerUser;
+    uint256 public maxDepositPerUser;
+    uint256 public minInvestPerUser;
 
-  /// @notice is the minimum amount of assets needed at depositsStop, if not reached , sale failed.
-  uint256 public softCap;
-  /// @notice Max cap of the vault
-  uint256 public hardCap;
+    /// @notice is the minimum amount of assets needed at depositsStop, if not reached , sale failed.
+    uint256 public softCap;
+    /// @notice Max cap of the vault
+    uint256 public hardCap;
 
-  /// @notice Price raises artifically , following the interests, every update from the R.W.A.It's reajusted with the total refund.
-  uint256 public tokenPrice; // Its a uint  price with decimals.
+    /// @notice Price raises artifically , following the interests, every update from the R.W.A.It's reajusted with the total refund.
+    uint256 public tokenPrice; // Its a uint  price with decimals.
 
-  uint256 public collectedCapital;
+    uint256 public collectedCapital;
 
-  string public vaultURI;
+    string public vaultURI;
 
-  /**
-   *****************************Mappings******************************************
-   */
+    /**
+     * Mappings******************************************
+     */
 
-  mapping(address => uint256) paid;
+    mapping(address => uint256) paid;
 
-  /**
-   *****************************Events******************************************
-   */
-  event TotalRefunded(address from, uint256 amount);
-  event InterestUpdated(address from, int256 amount);
-  event UnclaimedFundsCollected(uint256 amount);
-  event CapitalCollected(uint256 amount);
-  event CapitalLoss(
-    uint256 originalCapital,
-    uint256 remainingCapital,
-    uint256 loss
-  );
-  event InterestRefunded(uint256 refunded);
-  event CapitalRefunded(uint256 amount, uint256 collected);
+    /**
+     * Events******************************************
+     */
+    event TotalRefunded(address from, uint256 amount);
+    event InterestUpdated(address from, int256 amount);
+    event UnclaimedFundsCollected(uint256 amount);
+    event CapitalCollected(uint256 amount);
+    event CapitalLoss(uint256 originalCapital, uint256 remainingCapital, uint256 loss);
+    event InterestRefunded(uint256 refunded);
+    event CapitalRefunded(uint256 amount, uint256 collected);
 
-  event TimesUpdated(uint256 depositsStart, uint256 depositsStop);
-  event CapsUpdated(uint256 softCap, uint256 hardCap);
-  event VaultURIUpdated(string vaultURI_);
-  event TreasuryUpdated(address oldTreasury, address newTreasury);
-  event PriceUpdated(uint256 oldPrice, uint256 newPrice);
-  /**
-   *****************************Errors******************************************
-   */
-  error WrongDecimalNumber(
-    uint256 expected1,
-    uint256 expected2,
-    uint256 current
-  );
-  error BelowMinimumInvest(uint256 minimum, uint256 amount);
+    event TimesUpdated(uint256 depositsStart, uint256 depositsStop);
+    event CapsUpdated(uint256 softCap, uint256 hardCap);
+    event VaultURIUpdated(string vaultURI_);
+    event TreasuryUpdated(address oldTreasury, address newTreasury);
+    event PriceUpdated(uint256 oldPrice, uint256 newPrice);
+    /**
+     * Errors******************************************
+     */
 
-  error WrongSaleTimeStamps();
-  error TryToCollectZeroFund();
-  error WrongCaps();
-  error WrongDatabase();
-  error WrongTreasury(address treasury);
-  error WrongVaultURI(string vaultURI_);
-  error WrongMaxDepositPerUser(uint256 max, uint256 amountWanted);
-  error WrongMinDepositPerUser(uint256 maxDeposit, uint256 minInvest);
-  error NegativeCapital(int256 capitalAndInterest);
-  error InmpossibleInterest(int256 interest);
+    error WrongDecimalNumber(uint256 expected1, uint256 expected2, uint256 current);
+    error BelowMinimumInvest(uint256 minimum, uint256 amount);
 
-  error NotExpectedStep(SaleStep expected, SaleStep currentStep);
-  error WrongStep(SaleStep currentStep);
-  error MsgSenderUnauthorized(address msgSender);
-  error ReceiverUnauthorized(address receiver);
+    error WrongSaleTimeStamps();
+    error TryToCollectZeroFund();
+    error WrongCaps();
+    error WrongDatabase();
+    error WrongTreasury(address treasury);
+    error WrongVaultURI(string vaultURI_);
+    error WrongMaxDepositPerUser(uint256 max, uint256 amountWanted);
+    error WrongMinDepositPerUser(uint256 maxDeposit, uint256 minInvest);
+    error NegativeCapital(int256 capitalAndInterest);
+    error InmpossibleInterest(int256 interest);
 
-  constructor() initializer {}
+    error NotExpectedStep(SaleStep expected, SaleStep currentStep);
+    error WrongStep(SaleStep currentStep);
+    error MsgSenderUnauthorized(address msgSender);
+    error ReceiverUnauthorized(address receiver);
 
-  // ERROR  :
-  //Because of the constant ,
-  //we cannot use dai or agEur for a vault.
-  function initialize(
-    address asset_,
-    string memory name_,
-    string memory symbol_,
-    string memory vaultURI_,
-    address multisig,
-    address treasury_,
-    IDatabase dataBase_,
-    uint256 softCap_,
-    uint256 hardcap_,
-    uint256 depositsStart_,
-    uint256 depositsStop_
-  ) external initializer {
-    __Pausable_init();
-    __ERC4626_init(IERC20Upgradeable(asset_));
-    __ERC20_init(name_, symbol_);
-    __ReentrancyGuard_init();
+    constructor() initializer {}
 
-    if (!dataBase_.isDatabase()) revert WrongDatabase();
-    uint256 assetDecimals = IERC20MetadataUpgradeable(asset_).decimals();
-    if (assetDecimals != 18 && assetDecimals != 6)
-      revert WrongDecimalNumber(18, 6, assetDecimals);
-    uint256 commonMantissa_ = 10 ** assetDecimals;
-    _grantRole(KONKRETE, multisig);
-    _grantRole(DEV, multisig);
-    _grantRole(DEV, _msgSender());
+    // ERROR  :
+    //Because of the constant ,
+    //we cannot use dai or agEur for a vault.
+    function initialize(
+        address asset_,
+        string memory name_,
+        string memory symbol_,
+        string memory vaultURI_,
+        address multisig,
+        address treasury_,
+        IDatabase dataBase_,
+        uint256 softCap_,
+        uint256 hardcap_,
+        uint256 depositsStart_,
+        uint256 depositsStop_
+    ) external initializer {
+        __Pausable_init();
+        __ERC4626_init(IERC20Upgradeable(asset_));
+        __ERC20_init(name_, symbol_);
+        __ReentrancyGuard_init();
 
-    vaultURI = vaultURI_;
+        if (!dataBase_.isDatabase()) revert WrongDatabase();
+        uint256 assetDecimals = IERC20MetadataUpgradeable(asset_).decimals();
+        if (assetDecimals != 18 && assetDecimals != 6) {
+            revert WrongDecimalNumber(18, 6, assetDecimals);
+        }
+        uint256 commonMantissa_ = 10 ** assetDecimals;
+        _grantRole(KONKRETE, multisig);
+        _grantRole(DEV, multisig);
+        _grantRole(DEV, _msgSender());
 
-    softCap = softCap_;
-    hardCap = hardcap_;
+        vaultURI = vaultURI_;
 
-    depositsStart = depositsStart_;
-    depositsStop = depositsStop_;
+        softCap = softCap_;
+        hardCap = hardcap_;
 
-    treasury = treasury_;
-    dataBase = dataBase_;
+        depositsStart = depositsStart_;
+        depositsStop = depositsStop_;
 
-    maxDepositPerUser = softCap / 3;
-    minInvestPerUser = 500 * commonMantissa_;
+        treasury = treasury_;
+        dataBase = dataBase_;
 
-    commonMantissa = tokenPrice = commonMantissa_;
-  }
+        maxDepositPerUser = softCap / 3;
+        minInvestPerUser = 500 * commonMantissa_;
 
-  /**
-   *****************************External Functions******************************************
-   */
-  /** External Write functions
-   @notice accessControlled  functions
-  /
-
-  /**@dev Check if not address 0 or treasury is a contract (mutlisig , or other)*/
-  function setTreasury(address treasury_) external onlyRole(KONKRETE) {
-    if (treasury_.code.length == 0) revert WrongTreasury(treasury_);
-    emit TreasuryUpdated(treasury, treasury_);
-
-    treasury = treasury_;
-  }
-
-  // TIMELOCK functions
-
-  /**@notice Reddeem unclaimed assets after a certain time (seedphrase lost, forgotten, asset sent by mistake etc...) */
-  function collectUnclaimedFunds()
-    external
-    onlyRole(TIMELOCK)
-    returns (uint256 pendingFunds)
-  {
-    pendingFunds = _collect(SaleStep.CAPITAL_REFUNDED);
-    emit UnclaimedFundsCollected(pendingFunds);
-  }
-
-  // DEV functions
-  /** 
-@notice  Collect capital 👍
-@dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
- */
-  function collectCapital() external returns (uint256 collected) {
-    address treasury_ = treasury;
-    if (_msgSender() != treasury_) revert WrongTreasury(_msgSender());
-    collected = _collect(SaleStep.SALE_COMPLETE);
-    emit CapitalCollected(collected);
-  }
-
-  /**
-  @notice Refund after maturity, reset price and activate withdraw
-  @param capitalAndInterest is the total amount refunded at the end of maturity
- */
-  function refundCapital(uint256 capitalAndInterest) external {
-    if (_msgSender() != treasury) revert WrongTreasury(_msgSender());
-    SaleStep step = getStep();
-    if (step != SaleStep.SALE_COMPLETE && step != SaleStep.CAPITAL_REFUNDED)
-      revert WrongStep(step);
-
-    uint256 collectedCapital_ = collectedCapital;
-    if (collectedCapital_ > 0)
-      IERC20(asset()).safeTransferFrom(
-        _msgSender(),
-        address(this),
-        capitalAndInterest
-      );
-
-    emit CapitalRefunded(capitalAndInterest, collectedCapital_);
-
-    int256 interest = int256(capitalAndInterest) - int256(collectedCapital_);
-    uint256 oldPrice = tokenPrice;
-
-    if (interest < 0) {
-      emit CapitalLoss(
-        collectedCapital_,
-        capitalAndInterest,
-        uint256(-interest)
-      );
-    } else if (interest > 0) {
-      emit InterestRefunded(uint256(interest));
-    }
-    uint256 newPrice = priceImpact(capitalAndInterest);
-    tokenPrice = newPrice;
-    refunded = true;
-    emit PriceUpdated(oldPrice, newPrice);
-  }
-
-  /** 
-@notice  This function just raise the price artificially with price impact of the theoric raw interest
-@dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
- */
-
-  function updateInterest(int256 interest) external onlyRole(DEV) {
-    SaleStep step = getStep();
-    if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
-    uint256 oldPrice = tokenPrice;
-    uint256 newPrice;
-    if (interest < 0) {
-      uint256 decrement = priceImpact(uint256(-interest));
-      if (decrement > oldPrice) revert InmpossibleInterest(interest);
-      newPrice = oldPrice - decrement;
-      emit InterestUpdated(_msgSender(), interest);
-    } else {
-      uint256 increment = priceImpact(uint256(interest));
-      newPrice = oldPrice + increment;
-      emit InterestUpdated(_msgSender(), interest);
+        commonMantissa = tokenPrice = commonMantissa_;
     }
 
-    tokenPrice = newPrice;
+    /**
+     * External Functions******************************************
+     */
+    /**
+     * External Write functions
+     *    @notice accessControlled  functions
+     *   /
+     *
+     *   /**@dev Check if not address 0 or treasury is a contract (mutlisig , or other)
+     */
+    function setTreasury(address treasury_) external onlyRole(KONKRETE) {
+        if (treasury_.code.length == 0) revert WrongTreasury(treasury_);
+        emit TreasuryUpdated(treasury, treasury_);
 
-    emit PriceUpdated(oldPrice, newPrice);
-  }
+        treasury = treasury_;
+    }
 
-  function setDatabase(IDatabase database_) external onlyRole(DEV) {
-    if (!database_.isDatabase()) revert WrongDatabase();
-    dataBase = database_;
-  }
+    // TIMELOCK functions
 
-  function setTimes(uint256 start, uint256 stop) external onlyRole(DEV) {
-    SaleStep step = getStep();
-    if (uint256(step) > 2) revert WrongStep(step);
-    if (start > stop || start < block.timestamp) revert WrongSaleTimeStamps();
-    depositsStart = start;
-    depositsStop = stop;
-    emit TimesUpdated(start, stop);
-  }
+    /**
+     * @notice Reddeem unclaimed assets after a certain time (seedphrase lost, forgotten, asset sent by mistake etc...)
+     */
+    function collectUnclaimedFunds() external onlyRole(TIMELOCK) returns (uint256 pendingFunds) {
+        pendingFunds = _collect(SaleStep.CAPITAL_REFUNDED);
+        emit UnclaimedFundsCollected(pendingFunds);
+    }
 
-  function setCaps(uint256 soft, uint256 hard) external onlyRole(DEV) {
-    if (soft == 0 || soft > hard) revert WrongCaps();
-    softCap = soft;
-    hardCap = hard;
-    emit CapsUpdated(soft, hard);
-  }
+    // DEV functions
+    /**
+     * @notice  Collect capital 👍
+     * @dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
+     */
+    function collectCapital() external returns (uint256 collected) {
+        address treasury_ = treasury;
+        if (_msgSender() != treasury_) revert WrongTreasury(_msgSender());
+        collected = _collect(SaleStep.SALE_COMPLETE);
+        emit CapitalCollected(collected);
+    }
 
-  function setDepositLimitsPerUser(
-    uint256 minInvest_,
-    uint256 maxDeposit_
-  ) external onlyRole(DEV) {
-    uint256 softCap_ = softCap;
-    if (maxDeposit_ > softCap_)
-      revert WrongMaxDepositPerUser(softCap_, maxDeposit_);
-    if (minInvest_ >= maxDeposit_)
-      revert WrongMaxDepositPerUser(softCap_, minInvest_);
-    maxDepositPerUser = maxDeposit_;
-    minInvestPerUser = minInvest_;
-  }
+    /**
+     * @notice Refund after maturity, reset price and activate withdraw
+     *   @param capitalAndInterest is the total amount refunded at the end of maturity
+     */
+    function refundCapital(uint256 capitalAndInterest) external {
+        if (_msgSender() != treasury) revert WrongTreasury(_msgSender());
+        SaleStep step = getStep();
+        if (step != SaleStep.SALE_COMPLETE && step != SaleStep.CAPITAL_REFUNDED) {
+            revert WrongStep(step);
+        }
 
-  /** 
-@notice  Set vaults' URI  ( vaults information)  👍
-@param vaultURI_ require to not be an empty string
- */
-  function setVaultURI(string calldata vaultURI_) external onlyRole(KONKRETE) {
-    if (bytes(vaultURI_).length == 0) revert WrongVaultURI(vaultURI_);
+        uint256 collectedCapital_ = collectedCapital;
+        if (collectedCapital_ > 0) {
+            IERC20(asset()).safeTransferFrom(_msgSender(), address(this), capitalAndInterest);
+        }
 
-    emit VaultURIUpdated(vaultURI_);
-    vaultURI = vaultURI_;
-  }
+        emit CapitalRefunded(capitalAndInterest, collectedCapital_);
 
-  function pause() external onlyRole(DEV) {
-    _pause();
-  }
+        int256 interest = int256(capitalAndInterest) - int256(collectedCapital_);
+        uint256 oldPrice = tokenPrice;
 
-  function unpause() external onlyRole(KONKRETE) {
-    _unpause();
-  }
+        if (interest < 0) {
+            emit CapitalLoss(collectedCapital_, capitalAndInterest, uint256(-interest));
+        } else if (interest > 0) {
+            emit InterestRefunded(uint256(interest));
+        }
+        uint256 newPrice = priceImpact(capitalAndInterest);
+        tokenPrice = newPrice;
+        refunded = true;
+        emit PriceUpdated(oldPrice, newPrice);
+    }
 
-  /**
-  @notice Inverse of priceImpact
-   */
-  function amountImpact(
-    uint256 priceRaiseOrLower
-  ) external view returns (uint256) {
-    return priceRaiseOrLower.mulDiv(totalSupply(), commonMantissa);
-  }
+    /**
+     * @notice  This function just raise the price artificially with price impact of the theoric raw interest
+     * @dev Use balanceOf instead of collectedCapital , for token sent by mistake (or wallet trying inflation attack)
+     */
 
-  /**
-    @notice check the originalPrice */
-  function originalPrice() external view returns (uint256) {
-    return commonMantissa;
-  }
+    function updateInterest(int256 interest) external onlyRole(DEV) {
+        SaleStep step = getStep();
+        if (step != SaleStep.SALE_COMPLETE) revert WrongStep(step);
+        uint256 oldPrice = tokenPrice;
+        uint256 newPrice;
+        if (interest < 0) {
+            uint256 decrement = priceImpact(uint256(-interest));
+            if (decrement > oldPrice) revert InmpossibleInterest(interest);
+            newPrice = oldPrice - decrement;
+            emit InterestUpdated(_msgSender(), interest);
+        } else {
+            uint256 increment = priceImpact(uint256(interest));
+            newPrice = oldPrice + increment;
+            emit InterestUpdated(_msgSender(), interest);
+        }
 
-  /**
-   *****************************Public Functions******************************************
-   */
+        tokenPrice = newPrice;
 
-  //Public Write functions
+        emit PriceUpdated(oldPrice, newPrice);
+    }
 
-  /** 
-  @notice Deposit amount of @param assets in the vault and mint share to the @param receiver
-  @dev See {IERC4626-deposit}. 
-  Upgrades :
-  -modifiers
-  - See {function _invest(uint256 amount,address sender,address receiver,bool isDeposit) internal
-  )
-  */
-  function deposit(
-    uint256 assets,
-    address receiver
-  ) public override nonReentrant whenNotPaused returns (uint256) {
-    _invest(assets, _msgSender(), receiver);
-    return assets;
-  }
+    function setDatabase(IDatabase database_) external onlyRole(DEV) {
+        if (!database_.isDatabase()) revert WrongDatabase();
+        dataBase = database_;
+    }
 
-  /** 
-  @notice Mint amount of @param shares in the vault and ask for the assets in return @param receiver
-  @dev See {IERC4626-mint}. 
-  Upgrades :
-  - Minting is  a mirror deposit function (no freemint or etc...).
-  */
-  function mint(
-    uint256 shares,
-    address receiver
-  ) public override nonReentrant whenNotPaused returns (uint256) {
-    _invest(shares, _msgSender(), receiver);
-    return shares;
-  }
+    function setTimes(uint256 start, uint256 stop) external onlyRole(DEV) {
+        SaleStep step = getStep();
+        if (uint256(step) > 2) revert WrongStep(step);
+        if (start > stop || start < block.timestamp) revert WrongSaleTimeStamps();
+        depositsStart = start;
+        depositsStop = stop;
+        emit TimesUpdated(start, stop);
+    }
 
-  /** @notice Withdraw amount of assets when funds are ont the contract
-   @dev  See {IERC4626-withdraw}.
-   Upgrades : 
-   -Checking the sale periode
-   -Reduce collected capital if it happens before refund
-    */
-  function withdraw(
-    uint256 assets,
-    address receiver,
-    address owner
-  ) public override nonReentrant whenNotPaused returns (uint256 shares) {
-    SaleStep step = getStep();
-    if (uint256(step) == uint256(SaleStep.SALE_COMPLETE))
-      revert WrongStep(step);
-    shares = previewWithdraw(assets);
-    require(shares <= balanceOf(owner), "ERC4626: withdraw more than max");
+    function setCaps(uint256 soft, uint256 hard) external onlyRole(DEV) {
+        if (soft == 0 || soft > hard) revert WrongCaps();
+        softCap = soft;
+        hardCap = hard;
+        emit CapsUpdated(soft, hard);
+    }
 
-    _withdraw(_msgSender(), receiver, owner, assets, shares);
-  }
+    function setDepositLimitsPerUser(uint256 minInvest_, uint256 maxDeposit_) external onlyRole(DEV) {
+        uint256 softCap_ = softCap;
+        if (maxDeposit_ > softCap_) {
+            revert WrongMaxDepositPerUser(softCap_, maxDeposit_);
+        }
+        if (minInvest_ >= maxDeposit_) {
+            revert WrongMaxDepositPerUser(softCap_, minInvest_);
+        }
+        maxDepositPerUser = maxDeposit_;
+        minInvestPerUser = minInvest_;
+    }
 
-  //- Comme la fonction "_withdraw" n'etait pas réecrit, il faut ajouter " paid[owner]-= assets «
-  //la condition "if (step != SaleStep.CAPITAL_REFUNDED)" est inutile , car vous imposez deja la
-  //condition " if (uint256(step) == uint256(SaleStep.SALE_COMPLETE))
-  //response
-  // collectedCapital , when withdraw occurs when refunded will reduce
-  // Which is not needed (and gas cost)
-  //CRITICAL ERROR
-  // User cannot withdraw token thay receive from others
-  // User cannot take their interest if the price raise
-  function _withdraw(
-    address caller,
-    address receiver,
-    address owner,
-    uint assets,
-    uint shares
-  ) internal override {
-    super._withdraw(caller, receiver, owner, assets, shares);
-    collectedCapital -= assets;
-    paid[owner] -= assets;
-  }
+    /**
+     * @notice  Set vaults' URI  ( vaults information)  👍
+     * @param vaultURI_ require to not be an empty string
+     */
+    function setVaultURI(string calldata vaultURI_) external onlyRole(KONKRETE) {
+        if (bytes(vaultURI_).length == 0) revert WrongVaultURI(vaultURI_);
 
-  /** @notice Withdraw asset for a given @param shares (token) amount 
-    @dev Mirror function of withdraw
-   */
-  function redeem(
-    uint256 shares,
-    address receiver,
-    address owner
-  ) public override nonReentrant whenNotPaused returns (uint256 assets) {
-    SaleStep step = getStep();
-    if (uint256(step) == uint256(SaleStep.SALE_COMPLETE))
-      revert WrongStep(step);
+        emit VaultURIUpdated(vaultURI_);
+        vaultURI = vaultURI_;
+    }
 
-    require(shares <= balanceOf(owner), "ERC4626: redeem more than max");
+    function pause() external onlyRole(DEV) {
+        _pause();
+    }
 
-    assets = previewRedeem(shares);
-    _withdraw(_msgSender(), receiver, owner, assets, shares);
-  }
+    function unpause() external onlyRole(KONKRETE) {
+        _unpause();
+    }
 
-  //Public View functions
-  function minInvest(address user) public view returns (uint256) {
-    uint256 userPaid = paid[user];
-    uint256 minInvestPerUser_ = minInvestPerUser;
+    /**
+     * @notice Inverse of priceImpact
+     */
+    function amountImpact(uint256 priceRaiseOrLower) external view returns (uint256) {
+        return priceRaiseOrLower.mulDiv(totalSupply(), commonMantissa);
+    }
 
-    return userPaid >= minInvestPerUser_ ? 0 : minInvestPerUser_ - userPaid;
-  }
+    /**
+     * @notice check the originalPrice
+     */
+    function originalPrice() external view returns (uint256) {
+        return commonMantissa;
+    }
 
-  /** 
-  @notice Return the maximum asset Deposit that @param user can do. 
-  @dev See {IERC4626-maxDeposit}.
-  Upgrades:
-  =If he's not authorized return zero ,see the EIPs' standard) */
-  function maxDeposit(address user) public view override returns (uint256) {
-    return getStep() != SaleStep.SALE ? 0 : _maxDeposit(user);
-  }
+    /**
+     * Public Functions******************************************
+     */
 
-  /** 
-  @notice Return the maximum shares Mint that @param user can do. 
-  @dev Same changes as maxDeposit
-  */
-  function maxMint(address user) public view override returns (uint256) {
-    return getStep() != SaleStep.SALE ? 0 : _maxDeposit(user);
-  }
+    //Public Write functions
 
-  /** 
-  @notice Return the maximum shares Redeem that @param user can do. 
-  @dev Same changes as maxDeposit
-  */
-  function maxRedeem(address owner) public view override returns (uint256) {
-    return getStep() == SaleStep.SALE_COMPLETE ? 0 : balanceOf(owner);
-  }
+    /**
+     * @notice Deposit amount of @param assets in the vault and mint share to the @param receiver
+     *   @dev See {IERC4626-deposit}.
+     *   Upgrades :
+     *   -modifiers
+     *   - See {function _invest(uint256 amount,address sender,address receiver,bool isDeposit) internal
+     *   )
+     */
+    function deposit(uint256 assets, address receiver) public override nonReentrant whenNotPaused returns (uint256) {
+        _invest(assets, _msgSender(), receiver);
+        return assets;
+    }
 
-  /** 
-  @notice Return the maximum asset Withdraw that @param user can do. 
-  @dev Same changes as maxDeposit
-  */
-  function maxWithdraw(address owner) public view override returns (uint256) {
-    return
-      getStep() == SaleStep.SALE_COMPLETE
-        ? 0
-        : _convertToAssets(balanceOf(owner), MathUpgradeable.Rounding.Down);
-  }
+    /**
+     * @notice Mint amount of @param shares in the vault and ask for the assets in return @param receiver
+     *   @dev See {IERC4626-mint}.
+     *   Upgrades :
+     *   - Minting is  a mirror deposit function (no freemint or etc...).
+     */
+    function mint(uint256 shares, address receiver) public override nonReentrant whenNotPaused returns (uint256) {
+        _invest(shares, _msgSender(), receiver);
+        return shares;
+    }
 
-  /** 
-  @notice Check the vault's period
-  @return step  {see ./interface/IKonkreteVault.sol}
- */
-  function getStep() public view returns (SaleStep step) {
-    if (block.timestamp < depositsStart) return SaleStep.PREAUCTION;
-    if (block.timestamp < depositsStop) return SaleStep.SALE;
-    if (collectedCapital < softCap) return SaleStep.SALE_FAILED;
-    return refunded ? SaleStep.CAPITAL_REFUNDED : SaleStep.SALE_COMPLETE;
-  }
+    /**
+     * @notice Withdraw amount of assets when funds are ont the contract
+     *    @dev  See {IERC4626-withdraw}.
+     *    Upgrades :
+     *    -Checking the sale periode
+     *    -Reduce collected capital if it happens before refund
+     */
+    function withdraw(uint256 assets, address receiver, address owner)
+        public
+        override
+        nonReentrant
+        whenNotPaused
+        returns (uint256 shares)
+    {
+        SaleStep step = getStep();
+        if (uint256(step) == uint256(SaleStep.SALE_COMPLETE)) {
+            revert WrongStep(step);
+        }
+        shares = previewWithdraw(assets);
+        require(shares <= balanceOf(owner), "ERC4626: withdraw more than max");
 
-  /**@notice Check the absolute impact on the token's price of an @param amountOfInterest
-   * @dev  We multiplied by  the token mantissa before to have a real impact and not relative
-   * (floating point, which is non existant in solidity)
-   */
-  function priceImpact(uint256 amountOfInterest) public view returns (uint256) {
-    return amountOfInterest.mulDiv(commonMantissa, totalSupply());
-  }
+        _withdraw(_msgSender(), receiver, owner, assets, shares);
+    }
 
-  /**
-   *****************************Internal Functions******************************************
-   */
-  /** @notice Common function of mint & deposit
-    Because tokenPrice will be equal to commonMantissa till the sale is not completed, functions are pretty the same.
-   */
-  function _invest(uint256 amount, address sender, address receiver) internal {
-    if (!dataBase.canBuy(sender)) revert MsgSenderUnauthorized(sender);
+    //- Comme la fonction "_withdraw" n'etait pas réecrit, il faut ajouter " paid[owner]-= assets «
+    //la condition "if (step != SaleStep.CAPITAL_REFUNDED)" est inutile , car vous imposez deja la
+    //condition " if (uint256(step) == uint256(SaleStep.SALE_COMPLETE))
+    //response
+    // collectedCapital , when withdraw occurs when refunded will reduce
+    // Which is not needed (and gas cost)
+    //CRITICAL ERROR
+    // User cannot withdraw token thay receive from others
+    // User cannot take their interest if the price raise
+    function _withdraw(address caller, address receiver, address owner, uint256 assets, uint256 shares)
+        internal
+        override
+    {
+        super._withdraw(caller, receiver, owner, assets, shares);
+        collectedCapital -= assets;
+        paid[owner] -= assets;
+    }
 
-    SaleStep step = getStep();
-    if (step != SaleStep.SALE) revert NotExpectedStep(SaleStep.SALE, step);
+    /**
+     * @notice Withdraw asset for a given @param shares (token) amount
+     * @dev Mirror function of withdraw
+     */
+    function redeem(uint256 shares, address receiver, address owner)
+        public
+        override
+        nonReentrant
+        whenNotPaused
+        returns (uint256 assets)
+    {
+        SaleStep step = getStep();
+        if (uint256(step) == uint256(SaleStep.SALE_COMPLETE)) {
+            revert WrongStep(step);
+        }
 
-    require(amount <= _maxDeposit(sender), "ERC4626: deposit more than max");
-    uint256 min = minInvest(sender);
-    if (amount < min) revert BelowMinimumInvest(min, amount);
-    _deposit(sender, receiver, amount, amount);
-    collectedCapital += amount;
+        require(shares <= balanceOf(owner), "ERC4626: redeem more than max");
 
-    paid[sender] += amount;
-  }
+        assets = previewRedeem(shares);
+        _withdraw(_msgSender(), receiver, owner, assets, shares);
+    }
 
-  /** @notice Common function of collectCapital and collectUnClaimedCapital
-    Collect and transfer funds to the treasury
-   */
-  function _collect(
-    SaleStep expectedStep
-  ) internal returns (uint256 pendingFunds) {
-    SaleStep step = getStep();
-    if (step != expectedStep)
-      revert NotExpectedStep(SaleStep.CAPITAL_REFUNDED, step);
-    IERC20 stable = IERC20(asset());
-    pendingFunds = stable.balanceOf(address(this));
-    if (pendingFunds == 0) revert TryToCollectZeroFund();
-    stable.safeTransfer(treasury, pendingFunds);
-  }
+    //Public View functions
+    function minInvest(address user) public view returns (uint256) {
+        uint256 userPaid = paid[user];
+        uint256 minInvestPerUser_ = minInvestPerUser;
 
-  //Internal View functions
-  /**
-   * @notice Overrides the ERC4626 function check the amount of asset you can get d with a certain amount of share
-   * @param shares share = vaultToken amount
-   * @param rounding math rounding
-   */
-  function _convertToAssets(
-    uint256 shares,
-    MathUpgradeable.Rounding rounding
-  ) internal view override returns (uint256 assets) {
-    assets = shares > 0
-      ? shares.mulDiv(tokenPrice, commonMantissa, rounding)
-      : 0;
-  }
+        return userPaid >= minInvestPerUser_ ? 0 : minInvestPerUser_ - userPaid;
+    }
 
-  /**
-   * @notice Same as _convertToAssets but the input and output are reversed
-   */
+    /**
+     * @notice Return the maximum asset Deposit that @param user can do.
+     *   @dev See {IERC4626-maxDeposit}.
+     *   Upgrades:
+     *   =If he's not authorized return zero ,see the EIPs' standard)
+     */
+    function maxDeposit(address user) public view override returns (uint256) {
+        return getStep() != SaleStep.SALE ? 0 : _maxDeposit(user);
+    }
 
-  function _convertToShares(
-    uint256 assets,
-    MathUpgradeable.Rounding rounding
-  ) internal view override returns (uint256 shares) {
-    shares = assets > 0
-      ? assets.mulDiv(commonMantissa, tokenPrice, rounding)
-      : 0;
-  }
+    /**
+     * @notice Return the maximum shares Mint that @param user can do.
+     *   @dev Same changes as maxDeposit
+     */
+    function maxMint(address user) public view override returns (uint256) {
+        return getStep() != SaleStep.SALE ? 0 : _maxDeposit(user);
+    }
 
-  /**
-** fonction "_maxDeposit":
-- Dans cette fonction , vous devrez utiliser plutot "totalAssets()" au lieu de "totalSupply()".
-If somebody send stables , there's an issue.
-CRITICAL ERROR
-// If somebody send stable amount to the contract amount = hardcap - softcap + 1.
-//Sale cannot be launched !!!!
- */
-  function _maxDeposit(address user) internal view returns (uint256) {
-    uint256 hardCap_ = hardCap;
+    /**
+     * @notice Return the maximum shares Redeem that @param user can do.
+     *   @dev Same changes as maxDeposit
+     */
+    function maxRedeem(address owner) public view override returns (uint256) {
+        return getStep() == SaleStep.SALE_COMPLETE ? 0 : balanceOf(owner);
+    }
 
-    uint256 collectedK_ = totalAssets();
+    /**
+     * @notice Return the maximum asset Withdraw that @param user can do.
+     *   @dev Same changes as maxDeposit
+     */
+    function maxWithdraw(address owner) public view override returns (uint256) {
+        return
+            getStep() == SaleStep.SALE_COMPLETE ? 0 : _convertToAssets(balanceOf(owner), MathUpgradeable.Rounding.Down);
+    }
 
-    uint256 paidByUser = paid[user];
-    if (hardCap_ <= collectedK_ || maxDepositPerUser <= paidByUser) return 0;
+    /**
+     * @notice Check the vault's period
+     *   @return step  {see ./interface/IKonkreteVault.sol}
+     */
+    function getStep() public view returns (SaleStep step) {
+        if (block.timestamp < depositsStart) return SaleStep.PREAUCTION;
+        if (block.timestamp < depositsStop) return SaleStep.SALE;
+        if (collectedCapital < softCap) return SaleStep.SALE_FAILED;
+        return refunded ? SaleStep.CAPITAL_REFUNDED : SaleStep.SALE_COMPLETE;
+    }
 
-    uint256 userMax = maxDepositPerUser - paidByUser;
-    uint256 capedMax = hardCap_ - collectedK_;
+    /**
+     * @notice Check the absolute impact on the token's price of an @param amountOfInterest
+     * @dev  We multiplied by  the token mantissa before to have a real impact and not relative
+     * (floating point, which is non existant in solidity)
+     */
+    function priceImpact(uint256 amountOfInterest) public view returns (uint256) {
+        return amountOfInterest.mulDiv(commonMantissa, totalSupply());
+    }
 
-    return userMax > capedMax ? capedMax : userMax;
-  }
+    /**
+     * Internal Functions******************************************
+     */
+    /**
+     * @notice Common function of mint & deposit
+     * Because tokenPrice will be equal to commonMantissa till the sale is not completed, functions are pretty the same.
+     */
+    function _invest(uint256 amount, address sender, address receiver) internal {
+        if (!dataBase.canBuy(sender)) revert MsgSenderUnauthorized(sender);
+
+        SaleStep step = getStep();
+        if (step != SaleStep.SALE) revert NotExpectedStep(SaleStep.SALE, step);
+
+        require(amount <= _maxDeposit(sender), "ERC4626: deposit more than max");
+        uint256 min = minInvest(sender);
+        if (amount < min) revert BelowMinimumInvest(min, amount);
+        _deposit(sender, receiver, amount, amount);
+        collectedCapital += amount;
+
+        paid[sender] += amount;
+    }
+
+    /**
+     * @notice Common function of collectCapital and collectUnClaimedCapital
+     * Collect and transfer funds to the treasury
+     */
+    function _collect(SaleStep expectedStep) internal returns (uint256 pendingFunds) {
+        SaleStep step = getStep();
+        if (step != expectedStep) {
+            revert NotExpectedStep(SaleStep.CAPITAL_REFUNDED, step);
+        }
+        IERC20 stable = IERC20(asset());
+        pendingFunds = stable.balanceOf(address(this));
+        if (pendingFunds == 0) revert TryToCollectZeroFund();
+        stable.safeTransfer(treasury, pendingFunds);
+    }
+
+    //Internal View functions
+    /**
+     * @notice Overrides the ERC4626 function check the amount of asset you can get d with a certain amount of share
+     * @param shares share = vaultToken amount
+     * @param rounding math rounding
+     */
+    function _convertToAssets(uint256 shares, MathUpgradeable.Rounding rounding)
+        internal
+        view
+        override
+        returns (uint256 assets)
+    {
+        assets = shares > 0 ? shares.mulDiv(tokenPrice, commonMantissa, rounding) : 0;
+    }
+
+    /**
+     * @notice Same as _convertToAssets but the input and output are reversed
+     */
+
+    function _convertToShares(uint256 assets, MathUpgradeable.Rounding rounding)
+        internal
+        view
+        override
+        returns (uint256 shares)
+    {
+        shares = assets > 0 ? assets.mulDiv(commonMantissa, tokenPrice, rounding) : 0;
+    }
+
+    /**
+     * fonction "_maxDeposit":
+     * - Dans cette fonction , vous devrez utiliser plutot "totalAssets()" au lieu de "totalSupply()".
+     * If somebody send stables , there's an issue.
+     * CRITICAL ERROR
+     * // If somebody send stable amount to the contract amount = hardcap - softcap + 1.
+     * //Sale cannot be launched !!!!
+     */
+    function _maxDeposit(address user) internal view returns (uint256) {
+        uint256 hardCap_ = hardCap;
+
+        uint256 collectedK_ = totalAssets();
+
+        uint256 paidByUser = paid[user];
+        if (hardCap_ <= collectedK_ || maxDepositPerUser <= paidByUser) return 0;
+
+        uint256 userMax = maxDepositPerUser - paidByUser;
+        uint256 capedMax = hardCap_ - collectedK_;
+
+        return userMax > capedMax ? capedMax : userMax;
+    }
 }
