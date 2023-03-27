@@ -6,7 +6,7 @@ test = 'test/foundry'
 cache_path = 'forge-cache'
 
 [fuzz]
-runs = 600
+runs = 6000
 max_test_rejects = 4294967295
 
 gas_reports = ["*"]
